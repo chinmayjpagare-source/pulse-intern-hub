@@ -18,6 +18,8 @@ interface InternshipCardProps {
   stipend?: string;
   tags: string[];
   isBookmarked?: boolean;
+  onBookmarkToggle?: () => void;
+  skillMatch?: number;
 }
 
 const InternshipCard = ({
@@ -34,6 +36,8 @@ const InternshipCard = ({
   stipend,
   tags,
   isBookmarked = false,
+  onBookmarkToggle,
+  skillMatch,
 }: InternshipCardProps) => {
   const getModeColor = (mode: string) => {
     switch (mode) {
@@ -63,15 +67,23 @@ const InternshipCard = ({
               )}
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`transition-colors ${
-              isBookmarked ? "text-primary" : "text-muted-foreground hover:text-primary"
-            }`}
-          >
-            <Bookmark className={`h-4 w-4 ${isBookmarked ? "fill-current" : ""}`} />
-          </Button>
+          <div className="flex items-center gap-2">
+            {skillMatch !== undefined && (
+              <Badge variant={skillMatch > 60 ? "default" : "secondary"} className="text-xs">
+                {skillMatch}% match
+              </Badge>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onBookmarkToggle}
+              className={`transition-colors ${
+                isBookmarked ? "text-primary" : "text-muted-foreground hover:text-primary"
+              }`}
+            >
+              <Bookmark className={`h-4 w-4 ${isBookmarked ? "fill-current" : ""}`} />
+            </Button>
+          </div>
         </div>
       </CardHeader>
 
