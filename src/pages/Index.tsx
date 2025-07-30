@@ -3,6 +3,7 @@ import InternshipCard from "@/components/InternshipCard";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useProfile } from "@/hooks/useProfile";
 import { Target, TrendingUp, Award } from "lucide-react";
@@ -102,6 +103,7 @@ const sampleInternships = [
 const Index = () => {
   const { profile } = useProfile();
   const [bookmarkedIds, setBookmarkedIds] = useState(["2", "5"]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const toggleBookmark = (id: string) => {
     setBookmarkedIds(prev => 
@@ -123,9 +125,25 @@ const Index = () => {
     return Math.round((matches.length / internshipSkills.length) * 100);
   };
 
+  // Filter internships based on search query
+  const filterInternships = (internships: typeof sampleInternships) => {
+    if (!searchQuery.trim()) return internships;
+    
+    const query = searchQuery.toLowerCase();
+    return internships.filter(internship => 
+      internship.title.toLowerCase().includes(query) ||
+      internship.company.toLowerCase().includes(query) ||
+      internship.location.toLowerCase().includes(query) ||
+      internship.skills.some(skill => skill.toLowerCase().includes(query)) ||
+      internship.tags.some(tag => tag.toLowerCase().includes(query)) ||
+      internship.description.toLowerCase().includes(query)
+    );
+  };
+
   // Get personalized recommendations
   const getPersonalizedInternships = () => {
-    return sampleInternships
+    const filtered = filterInternships(sampleInternships);
+    return filtered
       .map(internship => ({
         ...internship,
         skillMatch: getSkillMatch(internship.skills)
@@ -135,8 +153,12 @@ const Index = () => {
 
   const personalizedInternships = getPersonalizedInternships();
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
   return (
-    <Layout>
+    <Layout onSearch={handleSearch}>
       <div className="p-6 max-w-7xl mx-auto space-y-8">
         <div>
           <h2 className="text-3xl font-bold text-foreground mb-2">
@@ -252,9 +274,21 @@ const Index = () => {
 
         {/* Curated Internships Feed */}
         <div>
-          <h3 className="text-xl font-semibold mb-4">
-            {profile.skills.length > 0 ? "Recommended for You" : "All Internships"}
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold">
+              {searchQuery ? `Search Results (${personalizedInternships.length})` : 
+               profile.skills.length > 0 ? "Recommended for You" : "All Internships"}
+            </h3>
+            {searchQuery && (
+              <Button 
+                variant="outline" 
+                onClick={() => setSearchQuery("")}
+                className="text-sm"
+              >
+                Clear Search
+              </Button>
+            )}
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {personalizedInternships.map((internship) => (
               <InternshipCard

@@ -9,8 +9,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const Header = () => {
+interface HeaderProps {
+  onSearch?: (query: string) => void;
+}
+
+const Header = ({ onSearch }: HeaderProps) => {
   const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    onSearch?.(query);
+  };
+
+  const handleSignOut = () => {
+    // TODO: Implement actual sign out logic
+    console.log("Signing out...");
+  };
 
   return (
     <header className="bg-card border-b border-border sticky top-0 z-50 shadow-sm">
@@ -38,7 +53,7 @@ const Header = () => {
                 john.doe@example.com
               </p>
             </div>
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem className="cursor-pointer" onClick={handleSignOut}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Sign Out</span>
             </DropdownMenuItem>
@@ -54,7 +69,7 @@ const Header = () => {
             type="text"
             placeholder="Search internships, companies, or skills..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleSearchChange}
             className="pl-10 pr-4 py-3 text-lg border-2 border-input focus:border-primary transition-colors rounded-xl bg-background shadow-sm"
           />
         </div>

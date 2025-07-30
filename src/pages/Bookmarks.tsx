@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import InternshipCard from "@/components/InternshipCard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -119,7 +120,7 @@ const Bookmarks = () => {
                     Start bookmarking internships from the Discover page to keep track of opportunities you're interested in.
                   </p>
                   <Button className="mt-4" asChild>
-                    <a href="/">Discover Internships</a>
+                    <Link to="/">Discover Internships</Link>
                   </Button>
                 </CardContent>
               </Card>

@@ -20,9 +20,11 @@ interface InternshipCardProps {
   isBookmarked?: boolean;
   onBookmarkToggle?: () => void;
   skillMatch?: number;
+  onApply?: () => void;
 }
 
 const InternshipCard = ({
+  id,
   title,
   company,
   isVerified,
@@ -38,6 +40,7 @@ const InternshipCard = ({
   isBookmarked = false,
   onBookmarkToggle,
   skillMatch,
+  onApply,
 }: InternshipCardProps) => {
   const getModeColor = (mode: string) => {
     switch (mode) {
@@ -163,7 +166,16 @@ const InternshipCard = ({
           ))}
         </div>
 
-        <Button className="w-full bg-gradient-primary hover:opacity-90 transition-opacity">
+        <Button 
+          onClick={() => {
+            if (onApply) {
+              onApply();
+            } else {
+              window.open(`mailto:hr@${company.toLowerCase().replace(/\s+/g, '')}.com?subject=Application for ${title} Internship`, '_blank');
+            }
+          }}
+          className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
+        >
           Apply Now
         </Button>
       </CardFooter>

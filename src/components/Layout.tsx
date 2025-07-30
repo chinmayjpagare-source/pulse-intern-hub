@@ -4,12 +4,13 @@ import Sidebar from "./Sidebar";
 
 interface LayoutProps {
   children: ReactNode;
+  onSearch?: (query: string) => void;
 }
 
-const Layout = ({ children }: LayoutProps) => {
+const Layout = ({ children, onSearch }: LayoutProps) => {
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      <Header />
+      <Header onSearch={onSearch} />
       <div className="flex">
         <Sidebar />
         <main className="flex-1 md:ml-0">
