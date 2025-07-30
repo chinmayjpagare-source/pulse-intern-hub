@@ -65,14 +65,18 @@ export default {
 			},
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',
-				'gradient-subtle': 'var(--gradient-subtle)'
+				'gradient-secondary': 'var(--gradient-secondary)',
+				'gradient-subtle': 'var(--gradient-subtle)',
+				'gradient-accent': 'var(--gradient-accent)'
 			},
 			boxShadow: {
 				'card': 'var(--shadow-card)',
-				'card-hover': 'var(--shadow-card-hover)'
+				'card-hover': 'var(--shadow-card-hover)',
+				'glow': 'var(--shadow-glow)'
 			},
 			transitionTimingFunction: {
-				'smooth': 'var(--transition-smooth)'
+				'smooth': 'var(--transition-smooth)',
+				'bounce': 'var(--transition-bounce)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
