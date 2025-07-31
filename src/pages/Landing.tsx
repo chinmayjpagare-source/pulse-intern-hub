@@ -23,61 +23,23 @@ const Landing = () => {
   const features = [
     {
       icon: Target,
-      title: "AI-Powered Matching",
-      description: "Get personalized internship recommendations based on your skills and interests"
+      title: "Smart Matching",
+      description: "Find internships that match your academic background and career interests"
     },
     {
       icon: Shield,
-      title: "Verified Companies",
-      description: "Only trusted and verified companies with legitimate internship opportunities"
+      title: "Verified Opportunities",
+      description: "All internships are posted by verified companies and approved by college administration"
     },
     {
       icon: BookOpen,
       title: "Interview Preparation",
-      description: "Practice with AI-generated interview questions tailored to your field"
-    },
-    {
-      icon: TrendingUp,
-      title: "Skill Gap Analysis",
-      description: "Identify missing skills and get recommendations for improvement"
+      description: "Access resources and tips to prepare for your internship interviews"
     },
     {
       icon: Users,
-      title: "Community Support",
-      description: "Connect with other interns and share experiences and tips"
-    },
-    {
-      icon: Zap,
-      title: "Real-time Updates",
-      description: "Get instant notifications about new opportunities and application deadlines"
-    }
-  ];
-
-  const stats = [
-    { number: "50,000+", label: "Active Internships", icon: Rocket },
-    { number: "10,000+", label: "Partner Companies", icon: Building },
-    { number: "95%", label: "Success Rate", icon: TrendingUp },
-    { number: "24/7", label: "Support Available", icon: Shield }
-  ];
-
-  const testimonials = [
-    {
-      name: "Priya Sharma",
-      role: "Software Engineering Intern at TechCorp",
-      content: "InternSphere helped me find the perfect internship that matched my React skills. The AI recommendations were spot-on!",
-      rating: 5
-    },
-    {
-      name: "Arjun Patel",
-      role: "Data Science Intern at Analytics Pro",
-      content: "The interview preparation feature was amazing. I felt confident and well-prepared for my interviews.",
-      rating: 5
-    },
-    {
-      name: "Sneha Reddy",
-      role: "Marketing Intern at Brand Solutions",
-      content: "Found my dream internship in just 2 weeks! The platform made the whole process so much easier.",
-      rating: 5
+      title: "College Community",
+      description: "Connect with fellow students and share internship experiences"
     }
   ];
 
@@ -116,7 +78,7 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto text-center">
           <div className="mb-8">
             <Badge className="bg-gradient-primary text-primary-foreground mb-4">
-              🚀 AI-Powered Internship Platform
+              🎓 College Internship Platform
             </Badge>
           </div>
           
@@ -126,35 +88,25 @@ const Landing = () => {
           </h1>
           
           <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
-            Discover thousands of verified internship opportunities with AI-powered matching, 
-            personalized recommendations, and comprehensive preparation tools.
+            Connect with verified internship opportunities posted by companies and approved by your college administration.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/discover">
               <Button size="lg" className="bg-gradient-primary text-primary-foreground hover:opacity-90 shadow-xl px-8 py-4 text-lg">
-                Start Exploring
+                Discover Internships
                 <Rocket className="ml-2 h-5 w-5" />
               </Button>
             </Link>
+            <Button size="lg" variant="outline" className="border-2 px-8 py-4 text-lg">
+              Sign In
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
             <Link to="/profile">
-              <Button size="lg" variant="outline" className="border-2 px-8 py-4 text-lg">
-                Create Profile
+              <Button size="lg" variant="ghost" className="px-8 py-4 text-lg">
+                Get Started
               </Button>
             </Link>
-          </div>
-
-          {/* Quick Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-            {stats.map((stat, index) => (
-              <Card key={index} className="border-2 shadow-lg hover:shadow-xl transition-shadow">
-                <CardContent className="p-6 text-center">
-                  <stat.icon className="h-8 w-8 mx-auto mb-3 text-primary" />
-                  <div className="text-2xl font-bold text-foreground mb-1">{stat.number}</div>
-                  <p className="text-sm text-muted-foreground">{stat.label}</p>
-                </CardContent>
-              </Card>
-            ))}
           </div>
         </div>
       </section>
@@ -237,40 +189,6 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="relative z-10 px-6 py-20 bg-card/50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
-              Success Stories
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              Hear from students who found their perfect internships
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="border-2 shadow-lg">
-                <CardContent className="p-6">
-                  <div className="flex mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground mb-4 italic">
-                    "{testimonial.content}"
-                  </p>
-                  <div>
-                    <div className="font-semibold text-foreground">{testimonial.name}</div>
-                    <div className="text-sm text-muted-foreground">{testimonial.role}</div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* CTA Section */}
       <section className="relative z-10 px-6 py-20">
