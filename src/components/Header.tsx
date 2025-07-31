@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Search, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,12 +33,12 @@ const Header = ({ onSearch }: HeaderProps) => {
       {/* Top Header Bar */}
       <div className="flex items-center justify-between px-6 py-3">
         {/* Logo */}
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+        <Link to="/" className="flex items-center space-x-2 group hover:opacity-80 transition-opacity">
+          <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center group-hover:shadow-lg transition-shadow">
             <span className="text-primary-foreground font-bold text-sm">IS</span>
           </div>
           <h1 className="text-xl font-bold text-primary">InternSphere</h1>
-        </div>
+        </Link>
 
         {/* User Dropdown */}
         <DropdownMenu>

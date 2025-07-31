@@ -13,7 +13,7 @@ import { useState } from "react";
 
 const sidebarItems = [
   { title: "Profile", url: "/profile", icon: User },
-  { title: "Discover Internships", url: "/", icon: Compass },
+  { title: "Discover Internships", url: "/discover", icon: Compass },
   { title: "Preparation", url: "/preparation", icon: BookOpen },
   { title: "Bookmarks", url: "/bookmarks", icon: Bookmark },
   { title: "Settings", url: "/settings", icon: Settings },
