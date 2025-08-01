@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import InternshipCard from "@/components/InternshipCard";
@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Bookmark, Calendar, Clock, AlertTriangle } from "lucide-react";
+import { useBookmarks } from "@/contexts/BookmarkContext";
 
 const sampleBookmarkedInternships = [
   {
@@ -60,11 +61,15 @@ const sampleBookmarkedInternships = [
 ];
 
 const Bookmarks = () => {
+  const { bookmarkedIds, toggleBookmark } = useBookmarks();
   const [bookmarkedInternships, setBookmarkedInternships] = useState(sampleBookmarkedInternships);
 
-  const removeBookmark = (id: string) => {
-    setBookmarkedInternships(prev => prev.filter(internship => internship.id !== id));
-  };
+  // Filter internships based on current bookmarked IDs
+  useEffect(() => {
+    setBookmarkedInternships(
+      sampleBookmarkedInternships.filter(internship => bookmarkedIds.includes(internship.id))
+    );
+  }, [bookmarkedIds]);
 
   const getDaysUntilDeadline = (deadline: string) => {
     const deadlineDate = new Date(deadline);
@@ -120,7 +125,7 @@ const Bookmarks = () => {
                     Start bookmarking internships from the Discover page to keep track of opportunities you're interested in.
                   </p>
                   <Button className="mt-4" asChild>
-                    <Link to="/">Discover Internships</Link>
+                    <Link to="/discover">Discover Internships</Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -131,7 +136,7 @@ const Bookmarks = () => {
                     <InternshipCard
                       {...internship}
                       isBookmarked={true}
-                      onBookmarkToggle={() => removeBookmark(internship.id)}
+                      onBookmarkToggle={() => toggleBookmark(internship.id)}
                     />
                     <div className="absolute top-4 left-4 bg-background border rounded-lg px-2 py-1">
                       <span className="text-xs text-muted-foreground">
@@ -219,7 +224,7 @@ const Bookmarks = () => {
                       <InternshipCard
                         {...internship}
                         isBookmarked={true}
-                        onBookmarkToggle={() => removeBookmark(internship.id)}
+                        onBookmarkToggle={() => toggleBookmark(internship.id)}
                       />
                       <div className="absolute top-4 right-4 bg-orange-100 border border-orange-200 rounded-lg px-2 py-1">
                         <span className="text-xs text-orange-800 font-medium">

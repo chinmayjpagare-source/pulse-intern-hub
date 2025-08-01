@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { BookmarkProvider } from "@/contexts/BookmarkContext";
 import Landing from "./pages/Landing";
 import Main from "./pages/Main";
 import Dashboard from "./pages/Dashboard";
@@ -19,24 +20,26 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="light" storageKey="internship-theme">
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/main" element={<Main />} />
-            <Route path="/discover" element={<Index />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/preparation" element={<Preparation />} />
-            <Route path="/bookmarks" element={<Bookmarks />} />
-            <Route path="/settings" element={<Settings />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <BookmarkProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/main" element={<Main />} />
+              <Route path="/discover" element={<Index />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/preparation" element={<Preparation />} />
+              <Route path="/bookmarks" element={<Bookmarks />} />
+              <Route path="/settings" element={<Settings />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </BookmarkProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );

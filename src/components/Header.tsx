@@ -30,15 +30,26 @@ const Header = ({ onSearch }: HeaderProps) => {
 
   return (
     <header className="bg-card border-b border-border sticky top-0 z-50 shadow-sm">
-      {/* Top Header Bar */}
       <div className="flex items-center justify-between px-6 py-3">
         {/* Logo */}
-        <Link to="/" className="flex items-center space-x-2 group hover:opacity-80 transition-opacity">
-          <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center group-hover:shadow-lg transition-shadow">
+        <div className="flex items-center space-x-2 group">
+          <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-sm">IS</span>
           </div>
           <h1 className="text-xl font-bold text-primary">InternSphere</h1>
-        </Link>
+        </div>
+
+        {/* Search Bar */}
+        <div className="flex-1 max-w-2xl mx-6 relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+          <Input
+            type="text"
+            placeholder="Search internships, companies, or skills..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="pl-10 pr-4 py-2 border-2 border-input focus:border-primary transition-colors rounded-xl bg-background shadow-sm"
+          />
+        </div>
 
         {/* User Dropdown */}
         <DropdownMenu>
@@ -60,20 +71,6 @@ const Header = ({ onSearch }: HeaderProps) => {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
-
-      {/* Search Bar */}
-      <div className="px-6 pb-4">
-        <div className="max-w-2xl mx-auto relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
-          <Input
-            type="text"
-            placeholder="Search internships, companies, or skills..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            className="pl-10 pr-4 py-3 text-lg border-2 border-input focus:border-primary transition-colors rounded-xl bg-background shadow-sm"
-          />
-        </div>
       </div>
     </header>
   );

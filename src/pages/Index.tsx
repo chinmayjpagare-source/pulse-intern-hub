@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useProfile } from "@/hooks/useProfile";
+import { useBookmarks } from "@/contexts/BookmarkContext";
 import { Target, TrendingUp, Award } from "lucide-react";
 
 const sampleInternships = [
@@ -102,16 +103,8 @@ const sampleInternships = [
 
 const Index = () => {
   const { profile } = useProfile();
-  const [bookmarkedIds, setBookmarkedIds] = useState(["2", "5"]);
+  const { bookmarkedIds, toggleBookmark } = useBookmarks();
   const [searchQuery, setSearchQuery] = useState("");
-
-  const toggleBookmark = (id: string) => {
-    setBookmarkedIds(prev => 
-      prev.includes(id) 
-        ? prev.filter(bookmarkId => bookmarkId !== id)
-        : [...prev, id]
-    );
-  };
 
   // Calculate skill matches for each internship
   const getSkillMatch = (internshipSkills: string[]) => {
