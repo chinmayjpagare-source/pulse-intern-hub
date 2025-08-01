@@ -119,9 +119,7 @@ const InternshipCard = ({
             {skills.slice(0, 4).map((skill, index) => <Badge key={index} variant="secondary" className="text-xs px-2 py-1">
                 {skill}
               </Badge>)}
-            {skills.length > 4 && <Badge variant="secondary" className="text-xs px-2 py-1">
-                +{skills.length - 4} more
-              </Badge>}
+            {skills.length > 4}
           </div>
         </div>
       </CardContent>
