@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const menuItems = [
-  { title: "Home", url: "/main", icon: Home },
+  { title: "Dashboard", url: "/dashboard", icon: Home },
   { title: "Discover Internships", url: "/discover", icon: Search },
   { title: "Profile", url: "/profile", icon: User },
   { title: "Preparation", url: "/preparation", icon: BookOpen },
@@ -45,7 +45,7 @@ export function AppSidebar() {
       <div className="p-4 border-b">
         <div className="flex items-center justify-between">
           {!isCollapsed && (
-            <Link to="/main" className="flex items-center space-x-2">
+            <Link to="/dashboard" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-sm">IS</span>
               </div>
