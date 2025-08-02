@@ -1,4 +1,4 @@
-import { MapPin, Clock, Calendar, DollarSign, Bookmark } from "lucide-react";
+import { MapPin, Clock, Calendar, Bookmark, FileText, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
@@ -21,6 +21,8 @@ interface InternshipCardProps {
   onBookmarkToggle?: () => void;
   skillMatch?: number;
   onApply?: () => void;
+  detailsDocument?: string;
+  applicationLink?: string;
 }
 
 const InternshipCard = ({
@@ -41,6 +43,8 @@ const InternshipCard = ({
   onBookmarkToggle,
   skillMatch,
   onApply,
+  detailsDocument,
+  applicationLink,
 }: InternshipCardProps) => {
   const getModeColor = (mode: string) => {
     switch (mode) {
@@ -119,7 +123,6 @@ const InternshipCard = ({
 
         {/* Stipend */}
         <div className="flex items-center mb-3">
-          <DollarSign className="h-4 w-4 mr-1 text-muted-foreground" />
           <span className="text-sm font-medium">
             {isPaid ? stipend : "Unpaid"}
           </span>
@@ -166,18 +169,23 @@ const InternshipCard = ({
           ))}
         </div>
 
-        <Button 
-          onClick={() => {
-            if (onApply) {
-              onApply();
-            } else {
-              window.open(`mailto:hr@${company.toLowerCase().replace(/\s+/g, '')}.com?subject=Application for ${title} Internship`, '_blank');
-            }
-          }}
-          className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
-        >
-          Apply Now
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={() => window.open(detailsDocument || '#', '_blank')}
+            variant="outline"
+            className="flex-1"
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            Details
+          </Button>
+          <Button 
+            onClick={() => window.open(applicationLink || '#', '_blank')}
+            className="flex-1 bg-gradient-primary hover:opacity-90 transition-opacity"
+          >
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Apply
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );

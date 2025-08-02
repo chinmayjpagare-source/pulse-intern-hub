@@ -5,9 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useProfile } from "@/hooks/useProfile";
 import { useBookmarks } from "@/contexts/BookmarkContext";
-import { Target, TrendingUp, Award } from "lucide-react";
+import { Target, TrendingUp, Award, Filter } from "lucide-react";
 
 const sampleInternships = [
   {
@@ -22,8 +23,11 @@ const sampleInternships = [
     skills: ["React", "Node.js", "JavaScript", "MongoDB", "AWS"],
     deadline: "Jan 15, 2024",
     isPaid: true,
-    stipend: "₹15,000/month",
+    stipend: "15,000/month",
     tags: ["Web Development", "Full Stack", "JavaScript"],
+    category: "Computer Science",
+    detailsDocument: "/internship-details/techcorp-fullstack.pdf",
+    applicationLink: "https://techcorp.com/apply/fullstack",
   },
   {
     id: "2",
@@ -37,8 +41,11 @@ const sampleInternships = [
     skills: ["Python", "TensorFlow", "PyTorch", "Pandas", "Scikit-learn"],
     deadline: "Jan 20, 2024",
     isPaid: true,
-    stipend: "₹20,000/month",
+    stipend: "20,000/month",
     tags: ["AI", "Machine Learning", "Python"],
+    category: "Computer Science",
+    detailsDocument: "/internship-details/ai-innovations-ml.pdf",
+    applicationLink: "https://aiinnovations.com/apply/ml-engineer",
   },
   {
     id: "3",
@@ -52,8 +59,11 @@ const sampleInternships = [
     skills: ["AutoCAD", "SolidWorks", "CATIA", "Mechanical Design"],
     deadline: "Jan 10, 2024",
     isPaid: true,
-    stipend: "₹12,000/month",
+    stipend: "12,000/month",
     tags: ["Mechanical", "CAD", "Automotive"],
+    category: "Mechanical Engineering",
+    detailsDocument: "/internship-details/autotech-mechanical.pdf",
+    applicationLink: "https://autotech.com/apply/mechanical",
   },
   {
     id: "4",
@@ -68,6 +78,9 @@ const sampleInternships = [
     deadline: "Jan 25, 2024",
     isPaid: false,
     tags: ["Data Science", "Analytics", "Statistics"],
+    category: "Computer Science",
+    detailsDocument: "/internship-details/analytics-pro-data.pdf",
+    applicationLink: "https://analyticspro.com/apply/data-science",
   },
   {
     id: "5",
@@ -81,8 +94,11 @@ const sampleInternships = [
     skills: ["React Native", "Flutter", "JavaScript", "Dart", "Firebase"],
     deadline: "Jan 30, 2024",
     isPaid: true,
-    stipend: "₹18,000/month",
+    stipend: "18,000/month",
     tags: ["Mobile", "React Native", "Flutter"],
+    category: "Computer Science",
+    detailsDocument: "/internship-details/appventure-mobile.pdf",
+    applicationLink: "https://appventure.com/apply/mobile-dev",
   },
   {
     id: "6",
@@ -96,15 +112,127 @@ const sampleInternships = [
     skills: ["Network Security", "Penetration Testing", "SIEM", "Python"],
     deadline: "Feb 5, 2024",
     isPaid: true,
-    stipend: "₹16,000/month",
+    stipend: "16,000/month",
     tags: ["Cybersecurity", "Network", "Security"],
+    category: "Computer Science",
+    detailsDocument: "/internship-details/securenet-cyber.pdf",
+    applicationLink: "https://securenet.com/apply/cybersecurity",
   },
+  {
+    id: "7",
+    title: "IoT Development Intern",
+    company: "SmartTech Solutions",
+    isVerified: true,
+    location: "Bangalore, India",
+    mode: "Hybrid" as const,
+    duration: "4 months",
+    description: "Work on Internet of Things projects, developing smart devices and connected systems for industrial applications.",
+    skills: ["Arduino", "Raspberry Pi", "C++", "Python", "IoT Protocols"],
+    deadline: "Feb 10, 2024",
+    isPaid: true,
+    stipend: "14,000/month",
+    tags: ["IoT", "Hardware", "Programming"],
+    category: "Electronics and Telecommunication",
+    detailsDocument: "/internship-details/smarttech-iot.pdf",
+    applicationLink: "https://smarttech.com/apply/iot",
+  },
+  {
+    id: "8",
+    title: "Signal Processing Research",
+    company: "TeleCom Research Lab",
+    isVerified: true,
+    location: "Mumbai, India",
+    mode: "On-site" as const,
+    duration: "6 months",
+    description: "Research and develop signal processing algorithms for next-generation communication systems and wireless technologies.",
+    skills: ["MATLAB", "Signal Processing", "DSP", "Communication Systems"],
+    deadline: "Feb 15, 2024",
+    isPaid: true,
+    stipend: "17,000/month",
+    tags: ["Research", "Signal Processing", "Telecom"],
+    category: "Electronics and Telecommunication",
+    detailsDocument: "/internship-details/telecom-research.pdf",
+    applicationLink: "https://telecomlab.com/apply/signal-processing",
+  },
+  {
+    id: "9",
+    title: "Medical Device Testing",
+    company: "BioMed Innovations",
+    isVerified: true,
+    location: "Chennai, India",
+    mode: "On-site" as const,
+    duration: "5 months",
+    description: "Test and validate medical devices, ensuring compliance with healthcare standards and regulatory requirements.",
+    skills: ["Medical Devices", "Testing Protocols", "Quality Assurance", "Regulatory Compliance"],
+    deadline: "Feb 20, 2024",
+    isPaid: true,
+    stipend: "15,000/month",
+    tags: ["Medical", "Testing", "Healthcare"],
+    category: "Biomedical Engineering",
+    detailsDocument: "/internship-details/biomed-testing.pdf",
+    applicationLink: "https://biomed.com/apply/device-testing",
+  },
+  {
+    id: "10",
+    title: "Bioinformatics Analyst",
+    company: "GeneTech Labs",
+    isVerified: true,
+    location: "Hyderabad, India",
+    mode: "Remote" as const,
+    duration: "4 months",
+    description: "Analyze genomic data and develop computational tools for biological research and drug discovery applications.",
+    skills: ["Python", "R", "Bioinformatics", "Data Analysis", "Machine Learning"],
+    deadline: "Feb 25, 2024",
+    isPaid: true,
+    stipend: "19,000/month",
+    tags: ["Bioinformatics", "Genomics", "Research"],
+    category: "Biomedical Engineering",
+    detailsDocument: "/internship-details/genetech-bioinformatics.pdf",
+    applicationLink: "https://genetech.com/apply/bioinformatics",
+  },
+  {
+    id: "11",
+    title: "Web Development",
+    company: "DigitalCraft Inc",
+    isVerified: true,
+    location: "Pune, India",
+    mode: "Hybrid" as const,
+    duration: "3 months",
+    description: "Create responsive websites and web applications using modern frameworks and technologies.",
+    skills: ["HTML", "CSS", "JavaScript", "React", "Node.js"],
+    deadline: "Mar 1, 2024",
+    isPaid: true,
+    stipend: "13,000/month",
+    tags: ["Web Development", "Frontend", "Backend"],
+    category: "Information Technology",
+    detailsDocument: "/internship-details/digitalcraft-web.pdf",
+    applicationLink: "https://digitalcraft.com/apply/web-dev",
+  },
+  {
+    id: "12",
+    title: "Database Administrator",
+    company: "DataVault Systems",
+    isVerified: true,
+    location: "Delhi, India",
+    mode: "On-site" as const,
+    duration: "5 months",
+    description: "Manage and optimize database systems, ensure data integrity and implement backup and recovery procedures.",
+    skills: ["SQL", "Database Management", "Oracle", "PostgreSQL", "MongoDB"],
+    deadline: "Mar 5, 2024",
+    isPaid: true,
+    stipend: "16,000/month",
+    tags: ["Database", "SQL", "Administration"],
+    category: "Information Technology",
+    detailsDocument: "/internship-details/datavault-dba.pdf",
+    applicationLink: "https://datavault.com/apply/dba",
+  }
 ];
 
 const Index = () => {
   const { profile } = useProfile();
   const { bookmarkedIds, toggleBookmark } = useBookmarks();
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   // Calculate skill matches for each internship
   const getSkillMatch = (internshipSkills: string[]) => {
@@ -118,19 +246,29 @@ const Index = () => {
     return Math.round((matches.length / internshipSkills.length) * 100);
   };
 
-  // Filter internships based on search query
+  // Filter internships based on search query and category
   const filterInternships = (internships: typeof sampleInternships) => {
-    if (!searchQuery.trim()) return internships;
-    
-    const query = searchQuery.toLowerCase();
-    return internships.filter(internship => 
-      internship.title.toLowerCase().includes(query) ||
-      internship.company.toLowerCase().includes(query) ||
-      internship.location.toLowerCase().includes(query) ||
-      internship.skills.some(skill => skill.toLowerCase().includes(query)) ||
-      internship.tags.some(tag => tag.toLowerCase().includes(query)) ||
-      internship.description.toLowerCase().includes(query)
-    );
+    let filtered = internships;
+
+    // Filter by category
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter(internship => internship.category === selectedCategory);
+    }
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(internship => 
+        internship.title.toLowerCase().includes(query) ||
+        internship.company.toLowerCase().includes(query) ||
+        internship.location.toLowerCase().includes(query) ||
+        internship.skills.some(skill => skill.toLowerCase().includes(query)) ||
+        internship.tags.some(tag => tag.toLowerCase().includes(query)) ||
+        internship.description.toLowerCase().includes(query)
+      );
+    }
+
+    return filtered;
   };
 
   // Get personalized recommendations
@@ -270,17 +408,39 @@ const Index = () => {
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold">
               {searchQuery ? `Search Results (${personalizedInternships.length})` : 
+               selectedCategory !== "all" ? `${selectedCategory} Internships (${personalizedInternships.length})` :
                profile.skills.length > 0 ? "Recommended for You" : "All Internships"}
             </h3>
-            {searchQuery && (
-              <Button 
-                variant="outline" 
-                onClick={() => setSearchQuery("")}
-                className="text-sm"
-              >
-                Clear Search
-              </Button>
-            )}
+            <div className="flex gap-2 items-center">
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="w-64">
+                    <SelectValue placeholder="Filter by category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    <SelectItem value="Computer Science">Computer Science</SelectItem>
+                    <SelectItem value="Information Technology">Information Technology</SelectItem>
+                    <SelectItem value="Electronics and Telecommunication">Electronics & Telecommunication</SelectItem>
+                    <SelectItem value="Biomedical Engineering">Biomedical Engineering</SelectItem>
+                    <SelectItem value="Mechanical Engineering">Mechanical Engineering</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {(searchQuery || selectedCategory !== "all") && (
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setSearchQuery("");
+                    setSelectedCategory("all");
+                  }}
+                  className="text-sm"
+                >
+                  Clear Filters
+                </Button>
+              )}
+            </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {personalizedInternships.map((internship) => (

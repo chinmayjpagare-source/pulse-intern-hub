@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Search, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,16 +16,41 @@ interface HeaderProps {
 
 const Header = ({ onSearch }: HeaderProps) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const navigate = useNavigate();
+
+  const sampleData = [
+    "React", "Python", "JavaScript", "TechCorp Solutions", "AI Innovations Ltd", 
+    "Bangalore", "Mumbai", "Delhi", "Full Stack Development", "Machine Learning",
+    "Data Science", "Mobile Development", "Cybersecurity", "Web Development"
+  ];
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
     onSearch?.(query);
+
+    if (query.trim()) {
+      const suggestions = sampleData
+        .filter(item => item.toLowerCase().includes(query.toLowerCase()))
+        .slice(0, 5);
+      setSearchSuggestions(suggestions);
+      setShowSuggestions(true);
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setSearchQuery(suggestion);
+    onSearch?.(suggestion);
+    setShowSuggestions(false);
+    navigate('/discover');
   };
 
   const handleSignOut = () => {
-    // TODO: Implement actual sign out logic
-    console.log("Signing out...");
+    navigate('/');
   };
 
   return (
@@ -47,8 +72,23 @@ const Header = ({ onSearch }: HeaderProps) => {
             placeholder="Search internships, companies, or skills..."
             value={searchQuery}
             onChange={handleSearchChange}
+            onFocus={() => searchQuery && setShowSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
             className="pl-10 pr-4 py-2 border-2 border-input focus:border-primary transition-colors rounded-xl bg-background shadow-sm"
           />
+          {showSuggestions && searchSuggestions.length > 0 && (
+            <div className="absolute top-full left-0 right-0 bg-popover border border-border rounded-lg shadow-lg mt-1 z-50">
+              {searchSuggestions.map((suggestion, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleSuggestionClick(suggestion)}
+                  className="px-4 py-2 hover:bg-accent cursor-pointer text-sm"
+                >
+                  {suggestion}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* User Dropdown */}
