@@ -43,8 +43,13 @@ const Profile = () => {
 
   const completeness = getProfileCompleteness();
 
+  const handleSearch = (query: string) => {
+    // Profile search could scroll to relevant sections or highlight matching fields
+    console.log(`Searching profile for: ${query}`);
+  };
+
   return (
-    <Layout>
+    <Layout onSearch={handleSearch}>
       <div className="p-6 max-w-4xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>

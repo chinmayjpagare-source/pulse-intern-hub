@@ -63,12 +63,13 @@ const sampleBookmarkedInternships = [
 const Bookmarks = () => {
   const { bookmarkedIds, toggleBookmark } = useBookmarks();
   const [bookmarkedInternships, setBookmarkedInternships] = useState(sampleBookmarkedInternships);
+  const [filteredInternships, setFilteredInternships] = useState(sampleBookmarkedInternships);
 
   // Filter internships based on current bookmarked IDs
   useEffect(() => {
-    setBookmarkedInternships(
-      sampleBookmarkedInternships.filter(internship => bookmarkedIds.includes(internship.id))
-    );
+    const filtered = sampleBookmarkedInternships.filter(internship => bookmarkedIds.includes(internship.id));
+    setBookmarkedInternships(filtered);
+    setFilteredInternships(filtered);
   }, [bookmarkedIds]);
 
   const getDaysUntilDeadline = (deadline: string) => {
@@ -93,8 +94,23 @@ const Bookmarks = () => {
     return "outline";
   };
 
+  const handleSearch = (query: string) => {
+    if (!query.trim()) {
+      setFilteredInternships(bookmarkedInternships);
+      return;
+    }
+    
+    const filtered = bookmarkedInternships.filter(internship =>
+      internship.title.toLowerCase().includes(query.toLowerCase()) ||
+      internship.company.toLowerCase().includes(query.toLowerCase()) ||
+      internship.skills.some(skill => skill.toLowerCase().includes(query.toLowerCase())) ||
+      internship.location.toLowerCase().includes(query.toLowerCase())
+    );
+    setFilteredInternships(filtered);
+  };
+
   return (
-    <Layout>
+    <Layout onSearch={handleSearch}>
       <div className="p-6 max-w-6xl mx-auto space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Bookmarks</h1>
@@ -116,7 +132,8 @@ const Bookmarks = () => {
           </TabsList>
 
           <TabsContent value="saved" className="space-y-6">
-            {bookmarkedInternships.length === 0 ? (
+            {filteredInternships.length === 0 ? (
+              bookmarkedInternships.length === 0 ? (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-16">
                   <Bookmark className="h-16 w-16 text-muted-foreground mb-4" />
@@ -129,14 +146,23 @@ const Bookmarks = () => {
                   </Button>
                 </CardContent>
               </Card>
+              ) : (
+                <Card>
+                  <CardContent className="flex flex-col items-center justify-center py-16">
+                    <AlertTriangle className="h-16 w-16 text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No Results Found</h3>
+                    <p className="text-muted-foreground text-center max-w-md">
+                      No bookmarked internships match your search criteria.
+                    </p>
+                  </CardContent>
+                </Card>
+              )
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {bookmarkedInternships.map((internship) => (
+                {filteredInternships.map((internship) => (
                   <div key={internship.id} className="relative">
                     <InternshipCard
                       {...internship}
-                      isBookmarked={true}
-                      onBookmarkToggle={() => toggleBookmark(internship.id)}
                     />
                     <div className="absolute top-4 left-4 bg-background border rounded-lg px-2 py-1">
                       <span className="text-xs text-muted-foreground">
@@ -223,8 +249,6 @@ const Bookmarks = () => {
                     <div key={internship.id} className="relative">
                       <InternshipCard
                         {...internship}
-                        isBookmarked={true}
-                        onBookmarkToggle={() => toggleBookmark(internship.id)}
                       />
                       <div className="absolute top-4 right-4 bg-orange-100 border border-orange-200 rounded-lg px-2 py-1">
                         <span className="text-xs text-orange-800 font-medium">

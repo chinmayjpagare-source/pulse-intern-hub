@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Search, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,23 +19,69 @@ const Header = ({ onSearch }: HeaderProps) => {
   const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Get search suggestions from internship data
+  // Get context-aware search suggestions based on current page
   const getSearchSuggestions = (query: string) => {
-    const allKeywords = [
-      "React", "Python", "JavaScript", "TechCorp Solutions", "AI Innovations Ltd", 
-      "Bangalore", "Mumbai", "Delhi", "Full Stack Development", "Machine Learning",
-      "Data Science", "Mobile Development", "Cybersecurity", "Web Development",
-      "Node.js", "MongoDB", "AWS", "TensorFlow", "PyTorch", "Analytics Pro",
-      "AppVenture Studio", "React Native", "Flutter", "Firebase", "SecureNet Systems",
-      "Network Security", "Penetration Testing", "SIEM", "SmartTech Solutions",
-      "Arduino", "Raspberry Pi", "IoT", "TeleCom Research Lab", "MATLAB",
-      "Signal Processing", "DSP", "BioMed Innovations", "Medical Devices",
-      "GeneTech Labs", "Bioinformatics", "Genomics", "DigitalCraft Inc",
-      "HTML", "CSS", "DataVault Systems", "SQL", "Database", "Oracle", "PostgreSQL"
-    ];
+    const currentPath = location.pathname;
     
-    return allKeywords.filter(keyword => 
+    let keywords: string[] = [];
+    
+    switch (currentPath) {
+      case '/discover':
+        keywords = [
+          "React", "Python", "JavaScript", "TechCorp Solutions", "AI Innovations Ltd", 
+          "Bangalore", "Mumbai", "Delhi", "Full Stack Development", "Machine Learning",
+          "Data Science", "Mobile Development", "Cybersecurity", "Web Development",
+          "Node.js", "MongoDB", "AWS", "TensorFlow", "PyTorch", "Analytics Pro",
+          "AppVenture Studio", "React Native", "Flutter", "Firebase", "SecureNet Systems",
+          "Network Security", "Penetration Testing", "SIEM", "SmartTech Solutions",
+          "Arduino", "Raspberry Pi", "IoT", "TeleCom Research Lab", "MATLAB",
+          "Signal Processing", "DSP", "BioMed Innovations", "Medical Devices",
+          "GeneTech Labs", "Bioinformatics", "Genomics", "DigitalCraft Inc",
+          "HTML", "CSS", "DataVault Systems", "SQL", "Database", "Oracle", "PostgreSQL"
+        ];
+        break;
+      case '/profile':
+        keywords = [
+          "Personal Information", "Academic Information", "Skills", "Resume",
+          "Preferences", "Name", "Email", "Phone", "Location", "Degree",
+          "University", "GPA", "Year of Study", "B.Tech", "M.Tech", "Engineering",
+          "Work Mode", "Duration", "Remote", "On-site", "Hybrid"
+        ];
+        break;
+      case '/preparation':
+        keywords = [
+          "HR Interview", "Technical Interview", "Behavioral Interview",
+          "Mock Interview", "Interview Questions", "Practice", "Feedback",
+          "Communication Skills", "Problem Solving", "Algorithms", "Data Structures",
+          "System Design", "Coding Interview", "Soft Skills", "Leadership",
+          "Teamwork", "Time Management", "Problem Solving"
+        ];
+        break;
+      case '/bookmarks':
+        keywords = [
+          "Saved Internships", "Bookmarked", "Favorites", "Upcoming Deadlines",
+          "Applied", "Interested", "TechCorp Solutions", "AI Innovations Ltd",
+          "Analytics Pro", "BioMed Innovations", "SmartTech Solutions"
+        ];
+        break;
+      case '/settings':
+        keywords = [
+          "Account Settings", "Security", "Notifications", "Appearance",
+          "Password", "Two-Factor Authentication", "Email Notifications",
+          "Push Notifications", "Dark Mode", "Light Mode", "Privacy",
+          "Export Data", "Delete Account", "Profile Settings"
+        ];
+        break;
+      default:
+        keywords = [
+          "React", "Python", "JavaScript", "TechCorp Solutions", "AI Innovations Ltd", 
+          "Bangalore", "Mumbai", "Delhi", "Full Stack Development", "Machine Learning"
+        ];
+    }
+    
+    return keywords.filter(keyword => 
       keyword.toLowerCase().includes(query.toLowerCase())
     );
   };
@@ -58,7 +104,10 @@ const Header = ({ onSearch }: HeaderProps) => {
     setSearchQuery(suggestion);
     onSearch?.(suggestion);
     setShowSuggestions(false);
-    navigate('/discover');
+    // Only navigate to discover if not already there
+    if (location.pathname !== '/discover' && location.pathname !== '/bookmarks') {
+      navigate('/discover');
+    }
   };
 
   const handleSignOut = () => {
@@ -81,7 +130,13 @@ const Header = ({ onSearch }: HeaderProps) => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
           <Input
             type="text"
-            placeholder="Search internships, companies, or skills..."
+            placeholder={
+              location.pathname === '/profile' ? "Search profile settings..." :
+              location.pathname === '/preparation' ? "Search interview topics..." :
+              location.pathname === '/bookmarks' ? "Search bookmarked internships..." :
+              location.pathname === '/settings' ? "Search settings..." :
+              "Search internships, companies, or skills..."
+            }
             value={searchQuery}
             onChange={handleSearchChange}
             onFocus={() => searchQuery && setShowSuggestions(true)}

@@ -129,8 +129,13 @@ const Preparation = () => {
     setMessages(prev => [...prev, feedbackMessage]);
   };
 
+  const handleSearch = (query: string) => {
+    // Preparation search could filter interview questions or topics
+    console.log(`Searching preparation for: ${query}`);
+  };
+
   return (
-    <Layout>
+    <Layout onSearch={handleSearch}>
       <div className="p-6 max-w-6xl mx-auto space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Interview Preparation</h1>

@@ -34,8 +34,13 @@ const Settings = () => {
     }));
   };
 
+  const handleSearch = (query: string) => {
+    // Settings search could filter or highlight relevant settings sections
+    console.log(`Searching settings for: ${query}`);
+  };
+
   return (
-    <Layout>
+    <Layout onSearch={handleSearch}>
       <div className="p-6 max-w-4xl mx-auto space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Settings</h1>

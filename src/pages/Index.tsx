@@ -429,8 +429,6 @@ const Index = () => {
               <InternshipCard
                 key={internship.id}
                 {...internship}
-                isBookmarked={bookmarkedIds.includes(internship.id)}
-                onBookmarkToggle={() => toggleBookmark(internship.id)}
                 skillMatch={internship.skillMatch}
               />
             ))}

@@ -2,6 +2,7 @@ import { MapPin, Clock, Calendar, Bookmark, FileText, ExternalLink } from "lucid
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { useBookmarks } from "@/contexts/BookmarkContext";
 interface InternshipCardProps {
   id: string;
   title: string;
@@ -16,8 +17,6 @@ interface InternshipCardProps {
   isPaid: boolean;
   stipend?: string;
   tags: string[];
-  isBookmarked?: boolean;
-  onBookmarkToggle?: () => void;
   skillMatch?: number;
   onApply?: () => void;
   detailsDocument?: string;
@@ -37,13 +36,12 @@ const InternshipCard = ({
   isPaid,
   stipend,
   tags,
-  isBookmarked = false,
-  onBookmarkToggle,
   skillMatch,
   onApply,
   detailsDocument,
   applicationLink
 }: InternshipCardProps) => {
+  const { isBookmarked, toggleBookmark } = useBookmarks();
   const getModeColor = (mode: string) => {
     switch (mode) {
       case "Remote":
@@ -72,8 +70,8 @@ const InternshipCard = ({
             {skillMatch !== undefined && <Badge variant={skillMatch > 60 ? "default" : "secondary"} className="text-xs">
                 {skillMatch}% match
               </Badge>}
-            <Button variant="ghost" size="sm" onClick={onBookmarkToggle} className={`transition-colors ${isBookmarked ? "text-primary" : "text-muted-foreground hover:text-primary"}`}>
-              <Bookmark className={`h-4 w-4 ${isBookmarked ? "fill-current" : ""}`} />
+            <Button variant="ghost" size="sm" onClick={() => toggleBookmark(id)} className={`transition-colors ${isBookmarked(id) ? "text-primary" : "text-muted-foreground hover:text-primary"}`}>
+              <Bookmark className={`h-4 w-4 ${isBookmarked(id) ? "fill-current" : ""}`} />
             </Button>
           </div>
         </div>
