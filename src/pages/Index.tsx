@@ -48,24 +48,6 @@ const sampleInternships = [
     applicationLink: "https://aiinnovations.com/apply/ml-engineer",
   },
   {
-    id: "3",
-    title: "Mechanical Design Intern",
-    company: "AutoTech Engineering",
-    isVerified: true,
-    location: "Chennai, India",
-    mode: "On-site" as const,
-    duration: "4 months",
-    description: "Design and prototype automotive components using CAD software. Collaborate with senior engineers on innovative vehicle technologies.",
-    skills: ["AutoCAD", "SolidWorks", "CATIA", "Mechanical Design"],
-    deadline: "Jan 10, 2024",
-    isPaid: true,
-    stipend: "12,000/month",
-    tags: ["Mechanical", "CAD", "Automotive"],
-    category: "Mechanical Engineering",
-    detailsDocument: "/internship-details/autotech-mechanical.pdf",
-    applicationLink: "https://autotech.com/apply/mechanical",
-  },
-  {
     id: "4",
     title: "Data Science Analyst",
     company: "Analytics Pro",
@@ -424,7 +406,7 @@ const Index = () => {
                     <SelectItem value="Information Technology">Information Technology</SelectItem>
                     <SelectItem value="Electronics and Telecommunication">Electronics & Telecommunication</SelectItem>
                     <SelectItem value="Biomedical Engineering">Biomedical Engineering</SelectItem>
-                    <SelectItem value="Mechanical Engineering">Mechanical Engineering</SelectItem>
+                    
                   </SelectContent>
                 </Select>
               </div>

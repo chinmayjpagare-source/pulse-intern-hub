@@ -20,11 +20,25 @@ const Header = ({ onSearch }: HeaderProps) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const navigate = useNavigate();
 
-  const sampleData = [
-    "React", "Python", "JavaScript", "TechCorp Solutions", "AI Innovations Ltd", 
-    "Bangalore", "Mumbai", "Delhi", "Full Stack Development", "Machine Learning",
-    "Data Science", "Mobile Development", "Cybersecurity", "Web Development"
-  ];
+  // Get search suggestions from internship data
+  const getSearchSuggestions = (query: string) => {
+    const allKeywords = [
+      "React", "Python", "JavaScript", "TechCorp Solutions", "AI Innovations Ltd", 
+      "Bangalore", "Mumbai", "Delhi", "Full Stack Development", "Machine Learning",
+      "Data Science", "Mobile Development", "Cybersecurity", "Web Development",
+      "Node.js", "MongoDB", "AWS", "TensorFlow", "PyTorch", "Analytics Pro",
+      "AppVenture Studio", "React Native", "Flutter", "Firebase", "SecureNet Systems",
+      "Network Security", "Penetration Testing", "SIEM", "SmartTech Solutions",
+      "Arduino", "Raspberry Pi", "IoT", "TeleCom Research Lab", "MATLAB",
+      "Signal Processing", "DSP", "BioMed Innovations", "Medical Devices",
+      "GeneTech Labs", "Bioinformatics", "Genomics", "DigitalCraft Inc",
+      "HTML", "CSS", "DataVault Systems", "SQL", "Database", "Oracle", "PostgreSQL"
+    ];
+    
+    return allKeywords.filter(keyword => 
+      keyword.toLowerCase().includes(query.toLowerCase())
+    );
+  };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -32,9 +46,7 @@ const Header = ({ onSearch }: HeaderProps) => {
     onSearch?.(query);
 
     if (query.trim()) {
-      const suggestions = sampleData
-        .filter(item => item.toLowerCase().includes(query.toLowerCase()))
-        .slice(0, 5);
+      const suggestions = getSearchSuggestions(query).slice(0, 5);
       setSearchSuggestions(suggestions);
       setShowSuggestions(true);
     } else {
