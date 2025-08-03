@@ -1,24 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pulse-intern-hub</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InternSphere - Find Your Dream Internship</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Landing Page -->
+    <div id="landing-page" class="landing-page">
+        <div class="landing-header">
+            <a href="#" onclick="showPage('discover')" class="logo">InternSphere</a>
+        </div>
+        <div class="landing-content">
+            <h1>Find Your Perfect Internship</h1>
+            <p>Discover opportunities that match your skills and career goals. Connect with top companies and kickstart your professional journey.</p>
+            <div class="landing-buttons">
+                <button class="btn btn-primary" onclick="showPage('discover')">Get Started</button>
+                <button class="btn btn-outline" onclick="showPage('discover')">Sign In</button>
+            </div>
+        </div>
+    </div>
 
-    <meta property="og:title" content="pulse-intern-hub" />
-    <meta property="og:description" content="Lovable Generated Project" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <!-- Main App -->
+    <div id="main-app" class="main-app" style="display: none;">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="logo">InternSphere</div>
+            </div>
+            <div class="header-center">
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="Search internships, companies, skills..." onkeyup="handleSearch(event)">
+                    <i class="fas fa-search"></i>
+                    <div id="search-suggestions" class="search-suggestions"></div>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                </button>
+                <div class="user-menu">
+                    <button class="user-avatar" onclick="toggleUserMenu()">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <div id="user-dropdown" class="user-dropdown">
+                        <a href="#" onclick="showPage('profile')">Profile</a>
+                        <a href="#" onclick="showPage('settings')">Settings</a>
+                        <a href="#" onclick="signOut()">Sign Out</a>
+                    </div>
+                </div>
+            </div>
+        </header>
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-  </head>
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-content">
+                <a href="#" onclick="showPage('dashboard')" class="sidebar-link" data-page="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" onclick="showPage('discover')" class="sidebar-link" data-page="discover">
+                    <i class="fas fa-search"></i>
+                    <span>Discover</span>
+                </a>
+                <a href="#" onclick="showPage('profile')" class="sidebar-link" data-page="profile">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+                <a href="#" onclick="showPage('preparation')" class="sidebar-link" data-page="preparation">
+                    <i class="fas fa-brain"></i>
+                    <span>Preparation</span>
+                </a>
+                <a href="#" onclick="showPage('bookmarks')" class="sidebar-link" data-page="bookmarks">
+                    <i class="fas fa-bookmark"></i>
+                    <span>Bookmarks</span>
+                </a>
+                <a href="#" onclick="showPage('settings')" class="sidebar-link" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </div>
+        </nav>
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page">
+                <h1>Dashboard</h1>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Applications</h3>
+                        <div class="stat-number">12</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Bookmarks</h3>
+                        <div class="stat-number" id="bookmark-count">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Profile Complete</h3>
+                        <div class="stat-number">75%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Discover Page -->
+            <div id="discover-page" class="page active">
+                <div class="page-header">
+                    <h1>Discover Internships</h1>
+                    <p>Find internships that match your interests and skills</p>
+                </div>
+                
+                <div class="filters">
+                    <button class="filter-btn active" onclick="filterInternships('all')">All</button>
+                    <button class="filter-btn" onclick="filterInternships('Computer Information Technology')">Computer IT</button>
+                    <button class="filter-btn" onclick="filterInternships('Electronics and Computer Science')">Electronics & CS</button>
+                    <button class="filter-btn" onclick="filterInternships('Electronics and Telecommunication')">Electronics & Telecom</button>
+                    <button class="filter-btn" onclick="filterInternships('Biomedical Engineering')">Biomedical Engineering</button>
+                </div>
+
+                <div id="internship-grid" class="internship-grid">
+                    <!-- Internship cards will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div id="profile-page" class="page">
+                <h1>Profile</h1>
+                <div class="profile-content">
+                    <div class="profile-section">
+                        <h2>Personal Information</h2>
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" id="profile-name" value="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="profile-email" value="john.doe@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="tel" id="profile-phone" placeholder="+91 XXXXX XXXXX">
+                        </div>
+                        <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preparation Page -->
+            <div id="preparation-page" class="page">
+                <h1>Interview Preparation</h1>
+                <div class="preparation-content">
+                    <div class="interview-types">
+                        <div class="interview-type-card" onclick="startInterview('HR')">
+                            <h3>HR Interview</h3>
+                            <p>Practice behavioral and general questions</p>
+                        </div>
+                        <div class="interview-type-card" onclick="startInterview('Technical')">
+                            <h3>Technical Interview</h3>
+                            <p>Coding and technical knowledge questions</p>
+                        </div>
+                        <div class="interview-type-card" onclick="startInterview('Behavioral')">
+                            <h3>Behavioral Interview</h3>
+                            <p>Situational and experience-based questions</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bookmarks Page -->
+            <div id="bookmarks-page" class="page">
+                <h1>Bookmarks</h1>
+                <div id="bookmarked-internships" class="internship-grid">
+                    <!-- Bookmarked internships will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="settings-page" class="page">
+                <h1>Settings</h1>
+                <div class="settings-content">
+                    <div class="settings-section">
+                        <h2>Appearance</h2>
+                        <div class="setting-item">
+                            <label>Dark Mode</label>
+                            <button class="toggle-switch" onclick="toggleTheme()" id="theme-toggle">
+                                <div class="toggle-slider"></div>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h2>Notifications</h2>
+                        <div class="setting-item">
+                            <label>Email Notifications</label>
+                            <button class="toggle-switch active" onclick="toggleSetting(this)">
+                                <div class="toggle-slider"></div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
 </html>
