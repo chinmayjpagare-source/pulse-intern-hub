@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import InternshipCard from "@/components/InternshipCard";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -215,6 +216,45 @@ const Index = () => {
   const { bookmarkedIds, toggleBookmark } = useBookmarks();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [internships, setInternships] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchInternships();
+  }, []);
+
+  const fetchInternships = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('internships')
+      .select('*')
+      .order('posted_date', { ascending: false });
+    
+    if (data) {
+      // Transform database internships to match the component format
+      const transformedData = data.map(internship => ({
+        id: internship.id,
+        title: internship.title,
+        company: internship.company,
+        isVerified: true,
+        location: internship.location,
+        mode: "Remote" as const,
+        duration: "3 months",
+        description: internship.description,
+        skills: internship.requirements || [],
+        deadline: new Date(internship.deadline || internship.posted_date).toLocaleDateString(),
+        isPaid: !!internship.salary_range,
+        stipend: internship.salary_range,
+        tags: internship.tags || [],
+        category: "Computer Science",
+        applicationLink: internship.application_url || "#",
+      }));
+      setInternships([...transformedData, ...sampleInternships]);
+    } else if (error) {
+      setInternships(sampleInternships);
+    }
+    setLoading(false);
+  };
 
   // Calculate skill matches for each internship
   const getSkillMatch = (internshipSkills: string[]) => {
@@ -255,7 +295,7 @@ const Index = () => {
 
   // Get personalized recommendations
   const getPersonalizedInternships = () => {
-    const filtered = filterInternships(sampleInternships);
+    const filtered = filterInternships(internships);
     return filtered
       .map(internship => ({
         ...internship,
@@ -269,6 +309,16 @@ const Index = () => {
   const handleSearch = (query: string) => {
     setSearchQuery(query);
   };
+
+  if (loading) {
+    return (
+      <Layout onSearch={handleSearch}>
+        <div className="p-6 max-w-7xl mx-auto">
+          <div className="text-center py-12">Loading internships...</div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout onSearch={handleSearch}>

@@ -11,15 +11,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
-const sidebarItems = [
-  { title: "Profile", url: "/profile", icon: User },
-  { title: "Discover Internships", url: "/discover", icon: Compass },
-  { title: "Preparation", url: "/preparation", icon: BookOpen },
-  { title: "Bookmarks", url: "/bookmarks", icon: Bookmark },
-  { title: "Settings", url: "/settings", icon: Settings },
-];
+import { useAuth } from "@/hooks/useAuth";
+import { Shield } from "lucide-react";
 
 const Sidebar = () => {
+  const { isAdmin } = useAuth();
+  
+  const sidebarItems = [
+    { title: "Profile", url: "/profile", icon: User },
+    { title: "Discover Internships", url: "/discover", icon: Compass },
+    { title: "Preparation", url: "/preparation", icon: BookOpen },
+    { title: "Bookmarks", url: "/bookmarks", icon: Bookmark },
+    { title: "Settings", url: "/settings", icon: Settings },
+    ...(isAdmin ? [{ title: "Admin Panel", url: "/admin", icon: Shield }] : []),
+  ];
+
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
