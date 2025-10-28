@@ -238,17 +238,17 @@ const Preparation = () => {
 
   return (
     <Layout onSearch={handleSearch}>
-      <div className="p-6 max-w-6xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Interview Preparation</h1>
-          <p className="text-muted-foreground">
+      <div className="h-full flex flex-col p-4 md:p-6 max-w-7xl mx-auto">
+        <div className="mb-4 flex-shrink-0">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Interview Preparation</h1>
+          <p className="text-sm text-muted-foreground">
             Practice with our AI-powered mock interview system to ace your internship interviews
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0">
           {/* Interview Setup Panel */}
-          <div className="lg:col-span-1 space-y-4">
+          <div className="lg:col-span-1 space-y-4 flex flex-col max-h-full overflow-y-auto">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -332,8 +332,8 @@ const Preparation = () => {
           </div>
 
           {/* Chat Interface */}
-          <div className="lg:col-span-2">
-            <Card className="h-[600px] flex flex-col">
+          <div className="lg:col-span-2 flex flex-col min-h-0">
+            <Card className="flex flex-col h-full min-h-[500px] lg:min-h-0">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <MessageCircle className="h-5 w-5" />
@@ -344,9 +344,9 @@ const Preparation = () => {
                 </CardTitle>
               </CardHeader>
               
-              <CardContent className="flex-1 flex flex-col">
+              <CardContent className="flex-1 flex flex-col min-h-0 p-4">
                 {/* Messages Area */}
-                <div className="flex-1 overflow-y-auto border rounded-lg p-4 space-y-4 mb-4 bg-muted/20">
+                <div className="flex-1 overflow-y-auto border rounded-lg p-3 space-y-3 mb-3 bg-muted/20 min-h-0">
                   {messages.length === 0 ? (
                     <div className="text-center text-muted-foreground py-8">
                       <MessageCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -389,25 +389,26 @@ const Preparation = () => {
 
                 {/* Input Area */}
                 {isInterviewActive && (
-                  <div className="space-y-2">
+                  <div className="space-y-2 flex-shrink-0">
                     <Textarea
                       value={currentMessage}
                       onChange={(e) => setCurrentMessage(e.target.value)}
                       placeholder="Type your answer here..."
-                      className="min-h-[80px]"
+                      className="min-h-[60px] max-h-[120px] resize-none"
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && e.ctrlKey) {
                           sendMessage();
                         }
                       }}
                     />
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center gap-2">
                       <p className="text-xs text-muted-foreground">
                         Press Ctrl+Enter to send
                       </p>
                       <Button 
                         onClick={sendMessage} 
                         disabled={!currentMessage.trim() || isLoading}
+                        size="sm"
                       >
                         {isLoading ? "AI is thinking..." : "Send Answer"}
                       </Button>
