@@ -49,7 +49,7 @@ const Preparation = () => {
     
     const welcomeMessage: Message = {
       role: "bot",
-      content: `Welcome to your ${selectedInterviewType} interview simulation. I'll be conducting this mock interview with you. Let's begin!`,
+      content: `Welcome to your ${selectedInterviewType} interview simulation. I'll be asking you questions, and you can answer them. When you're ready to finish, click "End Interview" for your evaluation. Let me start with the first question...`,
       timestamp: new Date()
     };
     
@@ -57,7 +57,7 @@ const Preparation = () => {
     
     try {
       await streamAIResponse([
-        { role: "user", content: `Start a ${selectedInterviewType} interview with an opening question.` }
+        { role: "user", content: `Please ask me the first ${selectedInterviewType} interview question. Just ask one clear question.` }
       ]);
     } catch (error) {
       console.error("Error starting interview:", error);
@@ -202,27 +202,33 @@ const Preparation = () => {
     setIsLoading(false);
   };
 
-  const endInterview = () => {
+  const endInterview = async () => {
+    setIsLoading(true);
+    
+    try {
+      // Build conversation history
+      const conversationHistory = messages.map(msg => ({
+        role: msg.role === "bot" ? "assistant" : "user",
+        content: msg.content
+      }));
+      
+      conversationHistory.push({
+        role: "user",
+        content: "The interview is now complete. Please provide a detailed evaluation of my performance including: 1) Overall score out of 100, 2) Key strengths, 3) Areas for improvement, 4) Specific feedback on my answers. Format it clearly."
+      });
+
+      await streamAIResponse(conversationHistory);
+    } catch (error) {
+      console.error("Error getting evaluation:", error);
+      toast({
+        title: "Error",
+        description: "Failed to get evaluation. Please try again.",
+        variant: "destructive",
+      });
+    }
+    
+    setIsLoading(false);
     setIsInterviewActive(false);
-    const score = Math.floor(Math.random() * 30) + 70; // Random score between 70-100
-    
-    const newSession: InterviewSession = {
-      id: Date.now().toString(),
-      type: selectedInterviewType as "HR" | "Technical" | "Behavioral",
-      duration: messages.length * 2, // Estimate 2 minutes per exchange
-      score,
-      completedAt: new Date()
-    };
-
-    setInterviewSessions(prev => [newSession, ...prev]);
-    
-    const feedbackMessage: Message = {
-      role: "bot",
-      content: `Interview completed! Your score: ${score}/100. Great job! Here's some feedback: Focus on providing more specific examples and quantifiable results in your answers.`,
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, feedbackMessage]);
   };
 
   const handleSearch = (query: string) => {
