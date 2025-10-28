@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageCircle, User, Bot, PlayCircle, Star, RotateCcw } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Message {
   role: "user" | "bot";
@@ -22,59 +23,149 @@ interface InterviewSession {
 }
 
 const Preparation = () => {
+  const { toast } = useToast();
   const [selectedInterviewType, setSelectedInterviewType] = useState<string>("");
   const [currentMessage, setCurrentMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isInterviewActive, setIsInterviewActive] = useState(false);
-  const [currentQuestion, setCurrentQuestion] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [interviewSessions, setInterviewSessions] = useState<InterviewSession[]>([
     { id: "1", type: "HR", duration: 15, score: 85, completedAt: new Date("2024-01-10") },
     { id: "2", type: "Technical", duration: 30, score: 78, completedAt: new Date("2024-01-08") },
     { id: "3", type: "Behavioral", duration: 20, score: 92, completedAt: new Date("2024-01-05") },
   ]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const interviewQuestions = {
-    HR: [
-      "Tell me about yourself and why you're interested in this internship.",
-      "What are your greatest strengths and weaknesses?",
-      "Where do you see yourself in 5 years?",
-      "Why should we hire you for this position?",
-      "What motivates you to work hard?"
-    ],
-    Technical: [
-      "Explain the difference between var, let, and const in JavaScript.",
-      "What is the time complexity of binary search?",
-      "How would you reverse a linked list?",
-      "Explain the concept of OOP and its principles.",
-      "What is the difference between SQL and NoSQL databases?"
-    ],
-    Behavioral: [
-      "Describe a time when you faced a challenging problem. How did you solve it?",
-      "Tell me about a time you worked in a team. What was your role?",
-      "Give an example of a goal you reached and tell me how you achieved it.",
-      "Describe a time when you had to learn something new quickly.",
-      "Tell me about a time you disagreed with a team member. How did you handle it?"
-    ]
-  };
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
-  const startInterview = () => {
+  const startInterview = async () => {
     if (!selectedInterviewType) return;
     
     setIsInterviewActive(true);
     setMessages([]);
-    const questions = interviewQuestions[selectedInterviewType as keyof typeof interviewQuestions];
-    const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
-    setCurrentQuestion(randomQuestion);
+    setIsLoading(true);
     
-    setMessages([{
+    const welcomeMessage: Message = {
       role: "bot",
-      content: `Welcome to your ${selectedInterviewType} interview simulation. Let's begin with the first question: ${randomQuestion}`,
+      content: `Welcome to your ${selectedInterviewType} interview simulation. I'll be conducting this mock interview with you. Let's begin!`,
       timestamp: new Date()
-    }]);
+    };
+    
+    setMessages([welcomeMessage]);
+    
+    try {
+      await streamAIResponse([
+        { role: "user", content: `Start a ${selectedInterviewType} interview with an opening question.` }
+      ]);
+    } catch (error) {
+      console.error("Error starting interview:", error);
+      toast({
+        title: "Error",
+        description: "Failed to start interview. Please try again.",
+        variant: "destructive",
+      });
+    }
+    
+    setIsLoading(false);
   };
 
-  const sendMessage = () => {
-    if (!currentMessage.trim()) return;
+  const streamAIResponse = async (conversationMessages: Array<{ role: string; content: string }>) => {
+    const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/interview-chat`;
+    
+    try {
+      const response = await fetch(CHAT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          messages: conversationMessages,
+          interviewType: selectedInterviewType,
+        }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          toast({
+            title: "Rate Limit",
+            description: "Too many requests. Please wait a moment.",
+            variant: "destructive",
+          });
+          return;
+        }
+        if (response.status === 402) {
+          toast({
+            title: "Credits Required",
+            description: "Please add credits to continue using AI features.",
+            variant: "destructive",
+          });
+          return;
+        }
+        throw new Error("Failed to get AI response");
+      }
+
+      if (!response.body) throw new Error("No response body");
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let accumulatedContent = "";
+
+      // Add an initial bot message that we'll update
+      const botMessageIndex = messages.length;
+      setMessages(prev => [...prev, {
+        role: "bot",
+        content: "",
+        timestamp: new Date()
+      }]);
+
+      let textBuffer = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        textBuffer += decoder.decode(value, { stream: true });
+        let newlineIndex: number;
+
+        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") break;
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) {
+              accumulatedContent += content;
+              setMessages(prev => 
+                prev.map((msg, idx) => 
+                  idx === botMessageIndex 
+                    ? { ...msg, content: accumulatedContent }
+                    : msg
+                )
+              );
+            }
+          } catch (e) {
+            console.error("Error parsing SSE:", e);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error streaming AI response:", error);
+      throw error;
+    }
+  };
+
+  const sendMessage = async () => {
+    if (!currentMessage.trim() || isLoading) return;
 
     const userMessage: Message = {
       role: "user",
@@ -83,27 +174,32 @@ const Preparation = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
-
-    // Simulate bot response
-    setTimeout(() => {
-      const responses = [
-        "That's a great answer! Can you provide a specific example?",
-        "Interesting perspective. How would you handle this in a team environment?",
-        "Good point. What challenges did you face and how did you overcome them?",
-        "Thank you for sharing. Let's move to the next question.",
-        "Excellent! Now, let me ask you about your technical experience..."
-      ];
-      
-      const botResponse: Message = {
-        role: "bot",
-        content: responses[Math.floor(Math.random() * responses.length)],
-        timestamp: new Date()
-      };
-
-      setMessages(prev => [...prev, botResponse]);
-    }, 1000);
-
     setCurrentMessage("");
+    setIsLoading(true);
+
+    try {
+      // Build conversation history for AI
+      const conversationHistory = messages.map(msg => ({
+        role: msg.role === "bot" ? "assistant" : "user",
+        content: msg.content
+      }));
+      
+      conversationHistory.push({
+        role: "user",
+        content: currentMessage
+      });
+
+      await streamAIResponse(conversationHistory);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    }
+    
+    setIsLoading(false);
   };
 
   const endInterview = () => {
@@ -251,34 +347,37 @@ const Preparation = () => {
                       <p>Select an interview type and start your practice session!</p>
                     </div>
                   ) : (
-                    messages.map((message, index) => (
-                      <div
-                        key={index}
-                        className={`flex items-start gap-3 ${
-                          message.role === "user" ? "flex-row-reverse" : ""
-                        }`}
-                      >
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                          message.role === "user" ? "bg-primary" : "bg-muted"
-                        }`}>
-                          {message.role === "user" ? (
-                            <User className="h-4 w-4 text-primary-foreground" />
-                          ) : (
-                            <Bot className="h-4 w-4 text-muted-foreground" />
-                          )}
+                     <>
+                      {messages.map((message, index) => (
+                        <div
+                          key={index}
+                          className={`flex items-start gap-3 ${
+                            message.role === "user" ? "flex-row-reverse" : ""
+                          }`}
+                        >
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                            message.role === "user" ? "bg-primary" : "bg-muted"
+                          }`}>
+                            {message.role === "user" ? (
+                              <User className="h-4 w-4 text-primary-foreground" />
+                            ) : (
+                              <Bot className="h-4 w-4 text-muted-foreground" />
+                            )}
+                          </div>
+                          <div className={`max-w-[80%] p-3 rounded-lg ${
+                            message.role === "user" 
+                              ? "bg-primary text-primary-foreground ml-auto" 
+                              : "bg-background border"
+                          }`}>
+                            <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                            <p className="text-xs opacity-70 mt-1">
+                              {message.timestamp.toLocaleTimeString()}
+                            </p>
+                          </div>
                         </div>
-                        <div className={`max-w-[80%] p-3 rounded-lg ${
-                          message.role === "user" 
-                            ? "bg-primary text-primary-foreground ml-auto" 
-                            : "bg-background border"
-                        }`}>
-                          <p className="text-sm">{message.content}</p>
-                          <p className="text-xs opacity-70 mt-1">
-                            {message.timestamp.toLocaleTimeString()}
-                          </p>
-                        </div>
-                      </div>
-                    ))
+                      ))}
+                      <div ref={messagesEndRef} />
+                    </>
                   )}
                 </div>
 
@@ -300,8 +399,11 @@ const Preparation = () => {
                       <p className="text-xs text-muted-foreground">
                         Press Ctrl+Enter to send
                       </p>
-                      <Button onClick={sendMessage} disabled={!currentMessage.trim()}>
-                        Send Answer
+                      <Button 
+                        onClick={sendMessage} 
+                        disabled={!currentMessage.trim() || isLoading}
+                      >
+                        {isLoading ? "AI is thinking..." : "Send Answer"}
                       </Button>
                     </div>
                   </div>
