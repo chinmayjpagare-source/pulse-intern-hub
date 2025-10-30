@@ -21,14 +21,22 @@ interface BookmarkProviderProps {
 }
 
 export const BookmarkProvider: React.FC<BookmarkProviderProps> = ({ children }) => {
-  const [bookmarkedIds, setBookmarkedIds] = useState<string[]>(["2", "5"]);
+  // Load bookmarks from localStorage on mount
+  const [bookmarkedIds, setBookmarkedIds] = useState<string[]>(() => {
+    const saved = localStorage.getItem("bookmarked-internships");
+    return saved ? JSON.parse(saved) : [];
+  });
 
   const toggleBookmark = (id: string) => {
-    setBookmarkedIds(prev => 
-      prev.includes(id) 
+    setBookmarkedIds(prev => {
+      const updated = prev.includes(id) 
         ? prev.filter(bookmarkId => bookmarkId !== id)
-        : [...prev, id]
-    );
+        : [...prev, id];
+      
+      // Save to localStorage
+      localStorage.setItem("bookmarked-internships", JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const isBookmarked = (id: string) => {

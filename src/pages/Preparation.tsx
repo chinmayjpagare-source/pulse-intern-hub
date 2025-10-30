@@ -49,7 +49,7 @@ const Preparation = () => {
     
     const welcomeMessage: Message = {
       role: "bot",
-      content: `Welcome to your ${selectedInterviewType} interview simulation. I'll be asking you questions, and you can answer them. When you're ready to finish, click "End Interview" for your evaluation. Let me start with the first question...`,
+      content: `Welcome to InterviewPro AI! I'm here to conduct your ${selectedInterviewType} interview simulation. I'll ask you questions one at a time, and you can respond with your answers. When you're ready to finish, click "End Interview" to receive a detailed evaluation of your performance. Let me start with the first question...`,
       timestamp: new Date()
     };
     
@@ -336,8 +336,8 @@ const Preparation = () => {
             <Card className="flex flex-col h-full min-h-[500px] lg:min-h-0">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <MessageCircle className="h-5 w-5" />
-                  Mock Interview Chat
+                  <Bot className="h-5 w-5 text-primary" />
+                  InterviewPro AI
                   {selectedInterviewType && (
                     <Badge variant="outline">{selectedInterviewType}</Badge>
                   )}
@@ -357,29 +357,30 @@ const Preparation = () => {
                       {messages.map((message, index) => (
                         <div
                           key={index}
-                          className={`flex items-start gap-3 ${
-                            message.role === "user" ? "flex-row-reverse" : ""
+                          className={`flex gap-3 ${
+                            message.role === "user" ? "justify-end" : "justify-start"
                           }`}
                         >
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                            message.role === "user" ? "bg-primary" : "bg-muted"
-                          }`}>
-                            {message.role === "user" ? (
-                              <User className="h-4 w-4 text-primary-foreground" />
-                            ) : (
-                              <Bot className="h-4 w-4 text-muted-foreground" />
-                            )}
-                          </div>
-                          <div className={`max-w-[80%] p-3 rounded-lg ${
+                          {message.role === "bot" && (
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center bg-primary flex-shrink-0">
+                              <Bot className="h-4 w-4 text-primary-foreground" />
+                            </div>
+                          )}
+                          <div className={`max-w-[75%] p-3 rounded-lg ${
                             message.role === "user" 
-                              ? "bg-primary text-primary-foreground ml-auto" 
-                              : "bg-background border"
+                              ? "bg-primary text-primary-foreground" 
+                              : "bg-muted"
                           }`}>
                             <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                             <p className="text-xs opacity-70 mt-1">
                               {message.timestamp.toLocaleTimeString()}
                             </p>
                           </div>
+                          {message.role === "user" && (
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center bg-secondary flex-shrink-0">
+                              <User className="h-4 w-4 text-secondary-foreground" />
+                            </div>
+                          )}
                         </div>
                       ))}
                       <div ref={messagesEndRef} />
