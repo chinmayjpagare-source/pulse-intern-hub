@@ -9,7 +9,57 @@ import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useProfile } from "@/hooks/useProfile";
 import { useBookmarks } from "@/contexts/BookmarkContext";
-import { Target, TrendingUp, Award, Filter } from "lucide-react";
+import { Target, TrendingUp, Award, Filter, ExternalLink } from "lucide-react";
+
+// Learning resources for skills
+const skillResources: Record<string, string> = {
+  "React": "https://react.dev/learn",
+  "Node.js": "https://nodejs.org/en/learn/getting-started/introduction-to-nodejs",
+  "JavaScript": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide",
+  "TypeScript": "https://www.typescriptlang.org/docs/handbook/intro.html",
+  "Python": "https://docs.python.org/3/tutorial/",
+  "Java": "https://docs.oracle.com/javase/tutorial/",
+  "C++": "https://cplusplus.com/doc/tutorial/",
+  "MongoDB": "https://www.mongodb.com/docs/manual/tutorial/",
+  "PostgreSQL": "https://www.postgresql.org/docs/current/tutorial.html",
+  "SQL": "https://www.w3schools.com/sql/",
+  "AWS": "https://aws.amazon.com/getting-started/",
+  "Docker": "https://docs.docker.com/get-started/",
+  "Kubernetes": "https://kubernetes.io/docs/tutorials/",
+  "TensorFlow": "https://www.tensorflow.org/tutorials",
+  "PyTorch": "https://pytorch.org/tutorials/",
+  "Machine Learning": "https://www.coursera.org/learn/machine-learning",
+  "Data Science": "https://www.kaggle.com/learn",
+  "React Native": "https://reactnative.dev/docs/getting-started",
+  "Flutter": "https://docs.flutter.dev/get-started/learn-more",
+  "Firebase": "https://firebase.google.com/docs/guides",
+  "Git": "https://git-scm.com/doc",
+  "HTML": "https://developer.mozilla.org/en-US/docs/Learn/HTML",
+  "CSS": "https://developer.mozilla.org/en-US/docs/Learn/CSS",
+  "Tailwind": "https://tailwindcss.com/docs",
+  "Express": "https://expressjs.com/en/starter/installing.html",
+  "Django": "https://docs.djangoproject.com/en/stable/intro/tutorial01/",
+  "Flask": "https://flask.palletsprojects.com/en/stable/tutorial/",
+  "Vue": "https://vuejs.org/guide/introduction.html",
+  "Angular": "https://angular.io/tutorial",
+  "GraphQL": "https://graphql.org/learn/",
+  "REST API": "https://restfulapi.net/",
+  "Microservices": "https://microservices.io/patterns/microservices.html",
+  "DevOps": "https://www.atlassian.com/devops",
+  "CI/CD": "https://www.redhat.com/en/topics/devops/what-is-ci-cd",
+  "Agile": "https://www.atlassian.com/agile",
+  "Scrum": "https://www.scrum.org/resources/what-scrum-module",
+  "Testing": "https://www.guru99.com/software-testing.html",
+  "Jest": "https://jestjs.io/docs/getting-started",
+  "Cypress": "https://docs.cypress.io/guides/overview/why-cypress",
+  "Selenium": "https://www.selenium.dev/documentation/",
+  "default": "https://www.google.com/search?q="
+};
+
+const getSkillResource = (skill: string): string => {
+  const normalizedSkill = skill.trim();
+  return skillResources[normalizedSkill] || `${skillResources.default}${encodeURIComponent(normalizedSkill + " tutorial")}`;
+};
 
 const sampleInternships = [
   {
@@ -230,7 +280,7 @@ const Index = () => {
       .select('*')
       .order('posted_date', { ascending: false });
     
-    if (data) {
+    if (data && data.length > 0) {
       // Transform database internships to match the component format
       const transformedData = data.map(internship => ({
         id: internship.id,
@@ -238,19 +288,21 @@ const Index = () => {
         company: internship.company,
         isVerified: true,
         location: internship.location,
-        mode: "Remote" as const,
+        mode: (internship.type || "Remote") as "Remote" | "On-site" | "Hybrid",
         duration: "3 months",
         description: internship.description,
         skills: internship.requirements || [],
-        deadline: new Date(internship.deadline || internship.posted_date).toLocaleDateString(),
+        deadline: internship.deadline ? new Date(internship.deadline).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : "Not specified",
         isPaid: !!internship.salary_range,
-        stipend: internship.salary_range,
+        stipend: internship.salary_range || undefined,
         tags: internship.tags || [],
         category: "Computer Science",
         applicationLink: internship.application_url || "#",
       }));
-      setInternships([...transformedData, ...sampleInternships]);
-    } else if (error) {
+      // Use only Supabase data, show sample data only if no DB data exists
+      setInternships(transformedData);
+    } else {
+      // Fallback to sample data only if no data in database
       setInternships(sampleInternships);
     }
     setLoading(false);
@@ -418,13 +470,28 @@ const Index = () => {
                       {missingSkills.length > 0 && (
                         <div>
                           <p className="text-sm font-medium mb-2">Skills to develop:</p>
-                          <div className="flex flex-wrap gap-1">
+                          <div className="flex flex-wrap gap-2">
                             {missingSkills.map((skill) => (
-                              <Badge key={skill} variant="outline" className="text-xs">
-                                {skill}
-                              </Badge>
+                              <a
+                                key={skill}
+                                href={getSkillResource(skill)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group"
+                              >
+                                <Badge 
+                                  variant="outline" 
+                                  className="text-xs cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors flex items-center gap-1"
+                                >
+                                  {skill}
+                                  <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                </Badge>
+                              </a>
                             ))}
                           </div>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            Click on any skill to access learning resources
+                          </p>
                         </div>
                       )}
                     </div>
