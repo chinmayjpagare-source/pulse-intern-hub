@@ -22,6 +22,7 @@ export const useAuth = () => {
           }, 0);
         } else {
           setIsAdmin(false);
+          setLoading(false);
         }
       }
     );
@@ -32,15 +33,18 @@ export const useAuth = () => {
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        checkAdminStatus(session.user.id);
+        checkAdminStatus(session.user.id).then(() => {
+          setLoading(false);
+        });
+      } else {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  const checkAdminStatus = async (userId: string) => {
+  const checkAdminStatus = async (userId: string): Promise<void> => {
     const { data } = await supabase
       .from('user_roles')
       .select('role')
