@@ -283,7 +283,33 @@ Would you like me to help you prepare for interviews at any of these companies?`
       
       conversationHistory.push({
         role: "user",
-        content: "The interview is now complete. Please provide a detailed evaluation of my performance including: 1) Overall confidence ratings (out of 10) for different aspects, 2) Key strengths, 3) Areas for improvement, 4) Specific feedback on my answers. Be encouraging and constructive. Format it clearly."
+        content: `The interview is now complete. Please provide a comprehensive evaluation of my performance.
+
+IMPORTANT: Base your evaluation ONLY on the answers I provided in this conversation. Do not make assumptions or evaluate skills I wasn't asked about.
+
+Please structure your evaluation as follows:
+
+1. **Performance Summary**
+   - Overall confidence rating (X/10)
+   - Brief overview of my performance
+
+2. **Detailed Analysis**
+   For each question I answered, provide:
+   - What I said (brief summary)
+   - What was good about my answer
+   - What could be improved
+   - Confidence rating for that answer (X/10)
+
+3. **Key Strengths**
+   List 2-3 specific strengths demonstrated in my actual answers with examples
+
+4. **Areas for Improvement**
+   List 2-3 specific areas with actionable advice based on my responses
+
+5. **Final Recommendations**
+   Concrete steps I can take to improve
+
+Be encouraging, constructive, and SPECIFIC. Reference my actual words and examples from this conversation.`
       });
 
       await streamAIResponse(conversationHistory);
