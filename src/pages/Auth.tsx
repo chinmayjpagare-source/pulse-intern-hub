@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { z } from "zod";
+import { Rocket, Users, Building, Award, Target } from "lucide-react";
 
 const emailSchema = z.string().email({ message: "Invalid email address" });
 const passwordSchema = z.string().min(6, { message: "Password must be at least 6 characters" });
@@ -101,15 +103,74 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-subtle flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">Welcome to InternSphere</CardTitle>
-          <CardDescription className="text-center">
-            Sign in to your account or create a new one
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+    <div className="min-h-screen bg-gradient-hero relative overflow-hidden flex">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl"></div>
+      </div>
+
+      {/* Left side - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 relative z-10 flex-col justify-center p-12">
+        <Link to="/" className="flex items-center space-x-3 mb-12 group w-fit">
+          <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-glow-lg group-hover:scale-110 transition-transform duration-300">
+            <span className="text-primary font-bold text-2xl">IS</span>
+          </div>
+          <h1 className="text-3xl font-bold text-white">InternSphere</h1>
+        </Link>
+
+        <div className="space-y-8 animate-fade-in">
+          <div>
+            <Badge className="bg-white/20 backdrop-blur-sm border border-white/30 text-white px-4 py-2 text-sm mb-6 shadow-glow">
+              🎓 Trusted by 10,000+ Students
+            </Badge>
+            <h2 className="text-5xl font-extrabold text-white mb-6 leading-tight">
+              Your Gateway to
+              <br />
+              <span className="bg-white bg-clip-text text-transparent">Dream Internships</span>
+            </h2>
+            <p className="text-xl text-white/90 leading-relaxed max-w-lg">
+              Join thousands of students who've found their perfect internship through our verified platform.
+            </p>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 gap-6 max-w-lg">
+            {[
+              { icon: Users, label: 'Active Students', value: '10,000+' },
+              { icon: Building, label: 'Companies', value: '1,000+' },
+              { icon: Award, label: 'Success Rate', value: '95%' },
+              { icon: Target, label: 'Internships', value: '500+' }
+            ].map((stat, index) => (
+              <div key={index} className="glass-card p-4 rounded-xl">
+                <stat.icon className="h-6 w-6 text-white mb-2" />
+                <div className="text-2xl font-bold text-white">{stat.value}</div>
+                <div className="text-sm text-white/80">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Right side - Auth Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 relative z-10">
+        <Card className="w-full max-w-md glass-card-dark shadow-glow-lg animate-scale-in">
+          <CardHeader className="text-center">
+            <div className="lg:hidden mb-4">
+              <Link to="/" className="flex items-center space-x-2 justify-center group">
+                <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center shadow-lg">
+                  <span className="text-primary-foreground font-bold text-lg">IS</span>
+                </div>
+                <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">InternSphere</h1>
+              </Link>
+            </div>
+            <CardTitle className="text-3xl font-bold">Welcome Back</CardTitle>
+            <CardDescription className="text-base">
+              Sign in to discover amazing opportunities
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
           <Tabs defaultValue="signin" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
@@ -189,6 +250,7 @@ const Auth = () => {
           </Tabs>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };

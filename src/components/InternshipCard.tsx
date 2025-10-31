@@ -150,23 +150,13 @@ const InternshipCard = ({
             </Badge>)}
         </div>
 
-        <div className="flex gap-3 w-full">
-          <Button 
-            onClick={() => window.open(detailsDocument || '#', '_blank')} 
-            variant="outline" 
-            className="flex-1 font-semibold hover:bg-primary hover:text-primary-foreground transition-colors group"
-          >
-            <FileText className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
-            View Details
-          </Button>
-          <Button 
-            onClick={() => window.open(applicationLink || '#', '_blank')}
-            className="flex-1 bg-gradient-primary hover:opacity-90 shadow-md font-semibold group"
-          >
-            Apply Now
-            <ExternalLink className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-          </Button>
-        </div>
+        <Button 
+          onClick={() => window.open(detailsDocument || '#', '_blank')} 
+          className="w-full bg-gradient-primary hover:opacity-90 shadow-md font-semibold group"
+        >
+          <FileText className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
+          View Details
+        </Button>
       </CardFooter>
     </Card>;
 };
