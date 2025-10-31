@@ -8,66 +8,21 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Bookmark, Calendar, Clock, AlertTriangle } from "lucide-react";
 import { useBookmarks } from "@/contexts/BookmarkContext";
-
-const sampleBookmarkedInternships = [
-  {
-    id: "2",
-    title: "Machine Learning Engineer",
-    company: "AI Innovations Ltd",
-    isVerified: true,
-    location: "Mumbai, India",
-    mode: "Remote" as const,
-    duration: "6 months",
-    description: "Develop and deploy machine learning models for real-world applications. Work with cutting-edge AI technologies and learn from industry experts.",
-    skills: ["Python", "TensorFlow", "PyTorch", "Pandas", "Scikit-learn"],
-    deadline: "Jan 20, 2024",
-    isPaid: true,
-    stipend: "₹20,000/month",
-    tags: ["AI", "Machine Learning", "Python"],
-    bookmarkedAt: new Date("2024-01-05"),
-  },
-  {
-    id: "5",
-    title: "Mobile App Development",
-    company: "AppVenture Studio",
-    isVerified: true,
-    location: "Hyderabad, India",
-    mode: "Hybrid" as const,
-    duration: "4 months",
-    description: "Build native and cross-platform mobile applications. Learn modern mobile development frameworks and user experience design principles.",
-    skills: ["React Native", "Flutter", "JavaScript", "Dart", "Firebase"],
-    deadline: "Jan 30, 2024",
-    isPaid: true,
-    stipend: "₹18,000/month",
-    tags: ["Mobile", "React Native", "Flutter"],
-    bookmarkedAt: new Date("2024-01-08"),
-  },
-  {
-    id: "7",
-    title: "Frontend Developer",
-    company: "WebCraft Solutions",
-    isVerified: true,
-    location: "Delhi, India",
-    mode: "Remote" as const,
-    duration: "3 months",
-    description: "Create responsive and interactive user interfaces using modern web technologies.",
-    skills: ["React", "TypeScript", "Tailwind CSS", "Next.js"],
-    deadline: "Jan 15, 2024",
-    isPaid: true,
-    stipend: "₹14,000/month",
-    tags: ["Frontend", "React", "Web Development"],
-    bookmarkedAt: new Date("2024-01-10"),
-  },
-];
+import { sampleInternships } from "@/data/internships";
 
 const Bookmarks = () => {
   const { bookmarkedIds, toggleBookmark } = useBookmarks();
-  const [bookmarkedInternships, setBookmarkedInternships] = useState(sampleBookmarkedInternships);
-  const [filteredInternships, setFilteredInternships] = useState(sampleBookmarkedInternships);
+  const [bookmarkedInternships, setBookmarkedInternships] = useState<typeof sampleInternships>([]);
+  const [filteredInternships, setFilteredInternships] = useState<typeof sampleInternships>([]);
 
   // Filter internships based on current bookmarked IDs
   useEffect(() => {
-    const filtered = sampleBookmarkedInternships.filter(internship => bookmarkedIds.includes(internship.id));
+    const filtered = sampleInternships
+      .filter(internship => bookmarkedIds.includes(internship.id))
+      .map(internship => ({
+        ...internship,
+        bookmarkedAt: new Date() // You could store actual bookmark dates in the context if needed
+      }));
     setBookmarkedInternships(filtered);
     setFilteredInternships(filtered);
   }, [bookmarkedIds]);
@@ -160,16 +115,10 @@ const Bookmarks = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {filteredInternships.map((internship) => (
-                  <div key={internship.id} className="relative">
-                    <InternshipCard
-                      {...internship}
-                    />
-                    <div className="absolute top-4 left-4 bg-background border rounded-lg px-2 py-1">
-                      <span className="text-xs text-muted-foreground">
-                        Saved {internship.bookmarkedAt.toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
+                  <InternshipCard
+                    key={internship.id}
+                    {...internship}
+                  />
                 ))}
               </div>
             )}
@@ -245,21 +194,12 @@ const Bookmarks = () => {
 
                 {/* Full cards view for upcoming deadlines */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {upcomingDeadlines.map((internship) => (
-                    <div key={internship.id} className="relative">
-                      <InternshipCard
-                        {...internship}
-                      />
-                      <div className="absolute top-4 right-4 bg-orange-100 border border-orange-200 rounded-lg px-2 py-1">
-                        <span className="text-xs text-orange-800 font-medium">
-                          {internship.daysUntilDeadline === 0 
-                            ? "Due Today" 
-                            : `${internship.daysUntilDeadline}d left`
-                          }
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                {upcomingDeadlines.map((internship) => (
+                  <InternshipCard
+                    key={internship.id}
+                    {...internship}
+                  />
+                ))}
                 </div>
               </div>
             )}

@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users, Shield, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { sampleInternships } from "@/data/internships";
+import { PDFUploadCard } from "@/components/PDFUploadCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Shield } from "lucide-react";
 
 interface Profile {
   id: string;
@@ -28,6 +30,7 @@ const Admin = () => {
   
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [userRoles, setUserRoles] = useState<UserRole[]>([]);
+  const [internshipPdfs, setInternshipPdfs] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
@@ -65,6 +68,13 @@ const Admin = () => {
     return role?.role || 'user';
   };
 
+  const handlePdfUpdate = (internshipId: string, url: string) => {
+    setInternshipPdfs(prev => ({
+      ...prev,
+      [internshipId]: url
+    }));
+  };
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
@@ -78,23 +88,24 @@ const Admin = () => {
       <div className="space-y-6 max-w-7xl mx-auto p-6">
         <div>
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <p className="text-muted-foreground">Monitor user authentication and activity</p>
+          <p className="text-muted-foreground">Manage users, PDFs, and system settings</p>
         </div>
 
         <Tabs defaultValue="users" className="w-full">
           <TabsList>
             <TabsTrigger value="users">
               <Users className="h-4 w-4 mr-2" />
-              User Profiles
+              User Management
             </TabsTrigger>
-            <TabsTrigger value="roles">
-              <Shield className="h-4 w-4 mr-2" />
-              User Roles
+            <TabsTrigger value="pdfs">
+              <FileText className="h-4 w-4 mr-2" />
+              Internship PDFs
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="users" className="space-y-4">
-            <Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card>
               <CardHeader>
                 <CardTitle>Registered Users</CardTitle>
                 <CardDescription>
@@ -128,12 +139,13 @@ const Admin = () => {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
 
-          <TabsContent value="roles" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>User Roles</CardTitle>
+                <CardTitle>
+                  <Shield className="h-5 w-5 inline mr-2" />
+                  User Roles
+                </CardTitle>
                 <CardDescription>
                   Manage user permissions and access levels
                 </CardDescription>
@@ -164,6 +176,31 @@ const Admin = () => {
                       No roles assigned yet
                     </p>
                   )}
+                </div>
+              </CardContent>
+            </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="pdfs" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Internship Detail PDFs</CardTitle>
+                <CardDescription>
+                  Upload PDF files for each internship. Students will see a "Details" button that opens these PDFs.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {sampleInternships.map((internship) => (
+                    <PDFUploadCard
+                      key={internship.id}
+                      internshipId={internship.id}
+                      internshipTitle={internship.title}
+                      currentPdfUrl={internshipPdfs[internship.id] || internship.detailsDocument}
+                      onPdfUploaded={(url) => handlePdfUpdate(internship.id, url)}
+                    />
+                  ))}
                 </div>
               </CardContent>
             </Card>
