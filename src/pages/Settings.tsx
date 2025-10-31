@@ -9,11 +9,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useProfile } from "@/hooks/useProfile";
+import { useToast } from "@/components/ui/use-toast";
 import { User, Shield, Bell, Palette, Moon, Sun } from "lucide-react";
 
 const Settings = () => {
   const { theme, setTheme } = useTheme();
-  const { profile, updateProfile } = useProfile();
+  const { profile, updateProfile, saveProfile, loading } = useProfile();
+  const { toast } = useToast();
   const [notifications, setNotifications] = useState({
     email: true,
     push: false,
@@ -25,6 +27,29 @@ const Settings = () => {
     updateProfile({
       personalInfo: { ...profile.personalInfo, [field]: value }
     });
+  };
+
+  const handleSaveProfile = async () => {
+    // Validate inputs
+    if (!profile.personalInfo.name.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Name cannot be empty",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (profile.personalInfo.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profile.personalInfo.email)) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter a valid email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    await saveProfile();
   };
 
   const handleNotificationToggle = (type: keyof typeof notifications) => {
@@ -118,7 +143,9 @@ const Settings = () => {
                 <Separator />
                 
                 <div className="flex justify-end">
-                  <Button>Save Changes</Button>
+                  <Button onClick={handleSaveProfile} disabled={loading}>
+                    {loading ? "Saving..." : "Save Changes"}
+                  </Button>
                 </div>
               </CardContent>
             </Card>
