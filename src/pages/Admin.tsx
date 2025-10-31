@@ -83,11 +83,33 @@ const Admin = () => {
     return role?.role || 'user';
   };
 
-  const handlePdfUpdate = (internshipId: string, url: string) => {
+  const handlePdfUpdate = async (internshipId: string, url: string) => {
+    // Update local state immediately for responsive UI
     setInternshipPdfs(prev => ({
       ...prev,
       [internshipId]: url
     }));
+
+    // Save to database
+    if (url) {
+      const { error } = await supabase
+        .from('internship_pdfs')
+        .upsert({
+          internship_id: internshipId,
+          pdf_url: url,
+          uploaded_by: user?.id
+        });
+      
+      if (error) {
+        console.error('Error saving PDF URL:', error);
+      }
+    } else {
+      // Delete from database if URL is empty (PDF was deleted)
+      await supabase
+        .from('internship_pdfs')
+        .delete()
+        .eq('internship_id', internshipId);
+    }
   };
 
   if (loading) {
