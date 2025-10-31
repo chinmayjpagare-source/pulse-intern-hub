@@ -122,9 +122,6 @@ const Auth = () => {
 
         <div className="space-y-8 animate-fade-in">
           <div>
-            <Badge className="bg-white/20 backdrop-blur-sm border border-white/30 text-white px-4 py-2 text-sm mb-6 shadow-glow">
-              🎓 Trusted by 10,000+ Students
-            </Badge>
             <h2 className="text-5xl font-extrabold text-white mb-6 leading-tight">
               Your Gateway to
               <br />
@@ -133,22 +130,6 @@ const Auth = () => {
             <p className="text-xl text-white/90 leading-relaxed max-w-lg">
               Join thousands of students who've found their perfect internship through our verified platform.
             </p>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 gap-6 max-w-lg">
-            {[
-              { icon: Users, label: 'Active Students', value: '10,000+' },
-              { icon: Building, label: 'Companies', value: '1,000+' },
-              { icon: Award, label: 'Success Rate', value: '95%' },
-              { icon: Target, label: 'Internships', value: '500+' }
-            ].map((stat, index) => (
-              <div key={index} className="glass-card p-4 rounded-xl">
-                <stat.icon className="h-6 w-6 text-white mb-2" />
-                <div className="text-2xl font-bold text-white">{stat.value}</div>
-                <div className="text-sm text-white/80">{stat.label}</div>
-              </div>
-            ))}
           </div>
         </div>
       </div>
