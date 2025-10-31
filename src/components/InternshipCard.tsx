@@ -146,17 +146,16 @@ const InternshipCard = ({
         </div>
         
         {/* View PDF Button */}
-        {pdfUrl && (
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => window.open(pdfUrl, '_blank')}
-            className="w-full mt-2 group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-          >
-            <FileText className="h-4 w-4 mr-2" />
-            View Details (PDF)
-          </Button>
-        )}
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => pdfUrl && window.open(pdfUrl, '_blank')}
+          disabled={!pdfUrl}
+          className="w-full mt-2 group-hover:bg-primary group-hover:text-primary-foreground transition-colors disabled:opacity-50"
+        >
+          <FileText className="h-4 w-4 mr-2" />
+          View Details (PDF)
+        </Button>
       </CardFooter>
     </Card>;
 };
