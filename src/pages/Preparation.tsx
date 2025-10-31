@@ -333,7 +333,7 @@ Be encouraging, constructive, and SPECIFIC. Reference my actual words and exampl
 
   return (
     <Layout onSearch={handleSearch}>
-      <div className="h-full flex flex-col p-4 md:p-6 max-w-7xl mx-auto">
+      <div className="h-full flex flex-col p-4 md:p-6 max-w-7xl mx-auto overflow-hidden">
         <div className="mb-4 flex-shrink-0">
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">Interview Preparation</h1>
           <p className="text-sm text-muted-foreground">
@@ -341,9 +341,9 @@ Be encouraging, constructive, and SPECIFIC. Reference my actual words and exampl
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0 overflow-hidden">
           {/* Interview Setup Panel */}
-          <div className="lg:col-span-1 space-y-4 flex flex-col max-h-full overflow-y-auto">
+          <div className="lg:col-span-1 space-y-4 flex flex-col overflow-y-auto">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -401,9 +401,9 @@ Be encouraging, constructive, and SPECIFIC. Reference my actual words and exampl
           </div>
 
           {/* Chat Interface */}
-          <div className="lg:col-span-2 flex flex-col min-h-0">
-            <Card className="flex flex-col h-full min-h-[500px] lg:min-h-0">
-              <CardHeader>
+          <div className="lg:col-span-2 flex flex-col min-h-0 overflow-hidden">
+            <Card className="flex flex-col h-full overflow-hidden">
+              <CardHeader className="flex-shrink-0">
                 <CardTitle className="flex items-center gap-2">
                   <Bot className="h-5 w-5 text-primary" />
                   InterviewPro AI
@@ -413,9 +413,9 @@ Be encouraging, constructive, and SPECIFIC. Reference my actual words and exampl
                 </CardTitle>
               </CardHeader>
               
-              <CardContent className="flex-1 flex flex-col min-h-0 p-4">
+              <CardContent className="flex-1 flex flex-col min-h-0 p-4 overflow-hidden">
                 {/* Messages Area */}
-                <div className="flex-1 overflow-y-auto border rounded-lg p-3 space-y-3 mb-3 bg-muted/20 min-h-0">
+                <div className="flex-1 overflow-y-auto border rounded-lg p-3 space-y-3 mb-3 bg-muted/20">
                   {messages.length === 0 ? (
                     <div className="text-center text-muted-foreground py-8">
                       <MessageCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
