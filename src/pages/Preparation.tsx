@@ -5,13 +5,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageCircle, User, Bot, PlayCircle, Star, RotateCcw } from "lucide-react";
+import { MessageCircle, User, Bot, PlayCircle, Star, RotateCcw, RefreshCw, Briefcase } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import ChatInternshipCard from "@/components/ChatInternshipCard";
 
 interface Message {
   role: "user" | "bot";
   content: string;
   timestamp: Date;
+  internships?: any[];
 }
 
 interface InterviewSession {
@@ -29,6 +32,7 @@ const Preparation = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isInterviewActive, setIsInterviewActive] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [internships, setInternships] = useState<any[]>([]);
   const [interviewSessions, setInterviewSessions] = useState<InterviewSession[]>([
     { id: "1", type: "HR", duration: 15, score: 85, completedAt: new Date("2024-01-10") },
     { id: "2", type: "Technical", duration: 30, score: 78, completedAt: new Date("2024-01-08") },
@@ -37,8 +41,61 @@ const Preparation = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    fetchInternships();
+  }, []);
+
+  const fetchInternships = async () => {
+    const { data, error } = await supabase
+      .from('internships')
+      .select('*')
+      .order('posted_date', { ascending: false })
+      .limit(10);
+    
+    if (data && data.length > 0) {
+      setInternships(data.map(internship => ({
+        id: internship.id,
+        title: internship.title,
+        company: internship.company,
+        location: internship.location,
+        mode: internship.type || "Remote",
+        duration: "3 months",
+        deadline: internship.deadline ? new Date(internship.deadline).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : undefined,
+        stipend: internship.salary_range,
+        skills: internship.requirements || [],
+        applicationLink: internship.application_url,
+      })));
+    }
+  };
+
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const checkForInternshipRequest = (message: string): boolean => {
+    const keywords = ['internship', 'job', 'opportunity', 'opening', 'position', 'recommend', 'suggest', 'show me'];
+    return keywords.some(keyword => message.toLowerCase().includes(keyword));
+  };
+
+  const getRelevantInternships = (userMessage: string) => {
+    // Simple keyword matching for skills
+    const skills = ['react', 'python', 'java', 'javascript', 'node', 'ml', 'machine learning', 'data', 'web', 'mobile', 'android', 'ios'];
+    const matchedSkills = skills.filter(skill => userMessage.toLowerCase().includes(skill));
+    
+    if (matchedSkills.length > 0 && internships.length > 0) {
+      // Return internships that match any of the skills
+      return internships
+        .filter(internship => 
+          matchedSkills.some(skill => 
+            internship.skills?.some((s: string) => s.toLowerCase().includes(skill)) ||
+            internship.title.toLowerCase().includes(skill)
+          )
+        )
+        .slice(0, 3);
+    }
+    
+    // Return first 3 internships as default
+    return internships.slice(0, 3);
+  };
 
   const startInterview = async () => {
     if (!selectedInterviewType) return;
@@ -49,7 +106,7 @@ const Preparation = () => {
     
     const welcomeMessage: Message = {
       role: "bot",
-      content: `Welcome to InterviewPro AI! I'm here to conduct your ${selectedInterviewType} interview simulation. I'll ask you questions one at a time, and you can respond with your answers. When you're ready to finish, click "End Interview" to receive a detailed evaluation of your performance. Let me start with the first question...`,
+      content: `Welcome to InterviewPro AI! 👋 I'm here to help you prepare for your ${selectedInterviewType} interview. I'll ask you questions one at a time, and you can respond naturally. I'll provide feedback with confidence ratings (1-10) to help you improve. You can also ask me to recommend internships anytime! When you're ready to finish, click "End Interview" for your evaluation. Let's begin with your first question...`,
       timestamp: new Date()
     };
     
@@ -174,10 +231,32 @@ const Preparation = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const userMessageText = currentMessage;
     setCurrentMessage("");
     setIsLoading(true);
 
     try {
+      // Check if user is asking for internship recommendations
+      if (checkForInternshipRequest(userMessageText)) {
+        const relevantInternships = getRelevantInternships(userMessageText);
+        
+        if (relevantInternships.length > 0) {
+          const internshipMessage: Message = {
+            role: "bot",
+            content: `Based on your interest, here are some great internship opportunities for you! These positions align well with your query. Take a look and feel free to apply to any that interest you. 
+
+Confidence in recommendations: 8/10
+
+Would you like me to help you prepare for interviews at any of these companies?`,
+            timestamp: new Date(),
+            internships: relevantInternships
+          };
+          setMessages(prev => [...prev, internshipMessage]);
+          setIsLoading(false);
+          return;
+        }
+      }
+
       // Build conversation history for AI
       const conversationHistory = messages.map(msg => ({
         role: msg.role === "bot" ? "assistant" : "user",
@@ -186,7 +265,7 @@ const Preparation = () => {
       
       conversationHistory.push({
         role: "user",
-        content: currentMessage
+        content: userMessageText
       });
 
       await streamAIResponse(conversationHistory);
@@ -214,7 +293,7 @@ const Preparation = () => {
       
       conversationHistory.push({
         role: "user",
-        content: "The interview is now complete. Please provide a detailed evaluation of my performance including: 1) Overall score out of 100, 2) Key strengths, 3) Areas for improvement, 4) Specific feedback on my answers. Format it clearly."
+        content: "The interview is now complete. Please provide a detailed evaluation of my performance including: 1) Overall confidence ratings (out of 10) for different aspects, 2) Key strengths, 3) Areas for improvement, 4) Specific feedback on my answers. Be encouraging and constructive. Format it clearly."
       });
 
       await streamAIResponse(conversationHistory);
@@ -301,6 +380,31 @@ const Preparation = () => {
               </CardContent>
             </Card>
 
+            {/* Internship Quick Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Briefcase className="h-5 w-5" />
+                  Internship Finder
+                </CardTitle>
+                <CardDescription>Get personalized recommendations</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Button 
+                  onClick={fetchInternships}
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Refresh Opportunities
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Ask me "Show me internships" or "Recommend jobs" anytime!
+                </p>
+              </CardContent>
+            </Card>
+
             {/* Previous Sessions */}
             <Card>
               <CardHeader>
@@ -355,32 +459,53 @@ const Preparation = () => {
                   ) : (
                      <>
                       {messages.map((message, index) => (
-                        <div
-                          key={index}
-                          className={`flex gap-3 ${
-                            message.role === "user" ? "justify-end" : "justify-start"
-                          }`}
-                        >
-                          {message.role === "bot" && (
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center bg-primary flex-shrink-0">
-                              <Bot className="h-4 w-4 text-primary-foreground" />
+                        <div key={index}>
+                          <div
+                            className={`flex gap-3 ${
+                              message.role === "user" ? "justify-end" : "justify-start"
+                            }`}
+                          >
+                            {message.role === "bot" && (
+                              <div className="w-8 h-8 rounded-full flex items-center justify-center bg-primary flex-shrink-0">
+                                <Bot className="h-4 w-4 text-primary-foreground" />
+                              </div>
+                            )}
+                            <div className={`max-w-[75%] ${
+                              message.role === "user" 
+                                ? "bg-primary text-primary-foreground p-3 rounded-lg" 
+                                : ""
+                            }`}>
+                              {message.role === "bot" ? (
+                                <div className="space-y-2">
+                                  <div className="bg-muted p-3 rounded-lg">
+                                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                                    <p className="text-xs opacity-70 mt-1">
+                                      {message.timestamp.toLocaleTimeString()}
+                                    </p>
+                                  </div>
+                                  {message.internships && message.internships.length > 0 && (
+                                    <div className="space-y-2 max-w-md">
+                                      {message.internships.map((internship, idx) => (
+                                        <ChatInternshipCard key={idx} {...internship} />
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <>
+                                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                                  <p className="text-xs opacity-70 mt-1">
+                                    {message.timestamp.toLocaleTimeString()}
+                                  </p>
+                                </>
+                              )}
                             </div>
-                          )}
-                          <div className={`max-w-[75%] p-3 rounded-lg ${
-                            message.role === "user" 
-                              ? "bg-primary text-primary-foreground" 
-                              : "bg-muted"
-                          }`}>
-                            <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                            <p className="text-xs opacity-70 mt-1">
-                              {message.timestamp.toLocaleTimeString()}
-                            </p>
+                            {message.role === "user" && (
+                              <div className="w-8 h-8 rounded-full flex items-center justify-center bg-secondary flex-shrink-0">
+                                <User className="h-4 w-4 text-secondary-foreground" />
+                              </div>
+                            )}
                           </div>
-                          {message.role === "user" && (
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center bg-secondary flex-shrink-0">
-                              <User className="h-4 w-4 text-secondary-foreground" />
-                            </div>
-                          )}
                         </div>
                       ))}
                       <div ref={messagesEndRef} />
