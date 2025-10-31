@@ -125,7 +125,7 @@ const Auth = () => {
             <h2 className="text-5xl font-extrabold text-white mb-6 leading-tight">
               Your Gateway to
               <br />
-              <span className="bg-white bg-clip-text text-transparent">Dream Internships</span>
+              <span className="bg-white bg-clip-text text-transparent">Compatible Internships</span>
             </h2>
           </div>
         </div>
