@@ -127,9 +127,6 @@ const Auth = () => {
               <br />
               <span className="bg-white bg-clip-text text-transparent">Dream Internships</span>
             </h2>
-            <p className="text-xl text-white/90 leading-relaxed max-w-lg">
-              Join thousands of students who've found their perfect internship through our verified platform.
-            </p>
           </div>
         </div>
       </div>

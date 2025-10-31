@@ -127,9 +127,6 @@ const Main = () => {
                     <h2 className="text-4xl font-bold text-primary-foreground mb-4">
                       Ready to Start Your Journey?
                     </h2>
-                    <p className="text-xl text-primary-foreground/90 mb-8">
-                      Join thousands of students who have found their perfect internships with InternSphere
-                    </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                       <Link to="/discover">
                         <Button size="lg" variant="secondary" className="px-8 py-4 text-lg">
