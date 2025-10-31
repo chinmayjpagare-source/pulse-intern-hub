@@ -9,6 +9,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
 
 interface HeaderProps {
   onSearch?: (query: string) => void;
@@ -20,6 +22,8 @@ const Header = ({ onSearch }: HeaderProps) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, signOut } = useAuth();
+  const { profile } = useProfile();
 
   // Get context-aware search suggestions based on current page
   const getSearchSuggestions = (query: string) => {
@@ -110,7 +114,8 @@ const Header = ({ onSearch }: HeaderProps) => {
     }
   };
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
+    await signOut();
     navigate('/');
   };
 
@@ -167,9 +172,11 @@ const Header = ({ onSearch }: HeaderProps) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56 bg-popover" align="end" forceMount>
             <div className="flex flex-col space-y-1 p-2">
-              <p className="text-sm font-medium leading-none">John Doe</p>
+              <p className="text-sm font-medium leading-none">
+                {profile.personalInfo.name || user?.user_metadata?.full_name || "User"}
+              </p>
               <p className="text-xs leading-none text-muted-foreground">
-                john.doe@example.com
+                {user?.email || "Not logged in"}
               </p>
             </div>
             <DropdownMenuItem className="cursor-pointer" onClick={handleSignOut}>
