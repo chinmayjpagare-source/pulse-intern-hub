@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useProfile } from "@/hooks/useProfile";
 import { useBookmarks } from "@/contexts/BookmarkContext";
+import { useToast } from "@/components/ui/use-toast";
 import { Target, TrendingUp, Award, Filter, ExternalLink } from "lucide-react";
 
 // Learning resources for skills
@@ -264,6 +265,7 @@ const sampleInternships = [
 const Index = () => {
   const { profile } = useProfile();
   const { bookmarkedIds, toggleBookmark } = useBookmarks();
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [internships, setInternships] = useState<any[]>([]);
@@ -280,7 +282,20 @@ const Index = () => {
       .select('*')
       .order('posted_date', { ascending: false });
     
+    if (error) {
+      console.error('Error fetching internships:', error);
+      toast({
+        title: "Error loading internships",
+        description: "Failed to fetch internships from database",
+        variant: "destructive",
+      });
+      setInternships(sampleInternships);
+      setLoading(false);
+      return;
+    }
+    
     if (data && data.length > 0) {
+      console.log('Fetched internships from database:', data.length);
       // Transform database internships to match the component format
       const transformedData = data.map(internship => ({
         id: internship.id,
@@ -291,18 +306,17 @@ const Index = () => {
         mode: (internship.type || "Remote") as "Remote" | "On-site" | "Hybrid",
         duration: "3 months",
         description: internship.description,
-        skills: internship.requirements || [],
+        skills: Array.isArray(internship.requirements) ? internship.requirements : [],
         deadline: internship.deadline ? new Date(internship.deadline).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : "Not specified",
         isPaid: !!internship.salary_range,
         stipend: internship.salary_range || undefined,
-        tags: internship.tags || [],
+        tags: Array.isArray(internship.tags) ? internship.tags : [],
         category: "Computer Science",
         applicationLink: internship.application_url || "#",
       }));
-      // Use only Supabase data, show sample data only if no DB data exists
       setInternships(transformedData);
     } else {
-      // Fallback to sample data only if no data in database
+      console.log('No internships in database, using sample data');
       setInternships(sampleInternships);
     }
     setLoading(false);
@@ -310,7 +324,9 @@ const Index = () => {
 
   // Calculate skill matches for each internship
   const getSkillMatch = (internshipSkills: string[]) => {
-    if (profile.skills.length === 0) return 0;
+    if (!profile || !profile.skills || profile.skills.length === 0) return 0;
+    if (!internshipSkills || internshipSkills.length === 0) return 0;
+    
     const matches = internshipSkills.filter(skill => 
       profile.skills.some(userSkill => 
         userSkill.toLowerCase().includes(skill.toLowerCase()) ||
@@ -431,7 +447,7 @@ const Index = () => {
         )}
 
         {/* Skill Gap Analysis */}
-        {profile.skills.length > 0 && (
+        {profile && profile.skills && profile.skills.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle>Skill Gap Analysis</CardTitle>
@@ -442,7 +458,7 @@ const Index = () => {
             <CardContent>
               <div className="space-y-4">
                 {personalizedInternships.slice(0, 3).map((internship) => {
-                  const missingSkills = internship.skills.filter(skill => 
+                  const missingSkills = (internship.skills || []).filter(skill => 
                     !profile.skills.some(userSkill => 
                       userSkill.toLowerCase().includes(skill.toLowerCase()) ||
                       skill.toLowerCase().includes(userSkill.toLowerCase())
@@ -489,9 +505,6 @@ const Index = () => {
                               </a>
                             ))}
                           </div>
-                          <p className="text-xs text-muted-foreground mt-2">
-                            Click on any skill to access learning resources
-                          </p>
                         </div>
                       )}
                     </div>

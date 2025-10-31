@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageCircle, User, Bot, PlayCircle, Star, RotateCcw, RefreshCw, Briefcase } from "lucide-react";
+import { MessageCircle, User, Bot, PlayCircle, RotateCcw } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import ChatInternshipCard from "@/components/ChatInternshipCard";
@@ -33,11 +33,6 @@ const Preparation = () => {
   const [isInterviewActive, setIsInterviewActive] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [internships, setInternships] = useState<any[]>([]);
-  const [interviewSessions, setInterviewSessions] = useState<InterviewSession[]>([
-    { id: "1", type: "HR", duration: 15, score: 85, completedAt: new Date("2024-01-10") },
-    { id: "2", type: "Technical", duration: 30, score: 78, completedAt: new Date("2024-01-08") },
-    { id: "3", type: "Behavioral", duration: 20, score: 92, completedAt: new Date("2024-01-05") },
-  ]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -377,60 +372,9 @@ Would you like me to help you prepare for interviews at any of these companies?`
                     </div>
                   )}
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Internship Quick Actions */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Briefcase className="h-5 w-5" />
-                  Internship Finder
-                </CardTitle>
-                <CardDescription>Get personalized recommendations</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Button 
-                  onClick={fetchInternships}
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                >
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Refresh Opportunities
-                </Button>
-                <p className="text-xs text-muted-foreground">
-                  Ask me "Show me internships" or "Recommend jobs" anytime!
+                <p className="text-xs text-muted-foreground mt-4">
+                  💡 Tip: You can ask me to recommend internships anytime during the chat!
                 </p>
-              </CardContent>
-            </Card>
-
-            {/* Previous Sessions */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Star className="h-5 w-5" />
-                  Recent Sessions
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {interviewSessions.slice(0, 5).map((session) => (
-                    <div key={session.id} className="flex justify-between items-center p-3 border rounded-lg">
-                      <div>
-                        <div className="font-medium text-sm">{session.type} Interview</div>
-                        <div className="text-xs text-muted-foreground">
-                          {session.duration} min • {session.completedAt?.toLocaleDateString()}
-                        </div>
-                      </div>
-                      {session.score && (
-                        <Badge variant={session.score > 80 ? "default" : "secondary"}>
-                          {session.score}/100
-                        </Badge>
-                      )}
-                    </div>
-                  ))}
-                </div>
               </CardContent>
             </Card>
           </div>
