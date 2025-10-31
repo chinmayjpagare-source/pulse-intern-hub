@@ -17,7 +17,7 @@ export const sampleInternships = [
     category: "Computer Science",
     detailsDocument: "",
     applicationLink: "https://techcorp.com/apply/fullstack",
-    pdfUrl: "",
+    pdfUrl: "https://drive.google.com/file/d/1qaZCmVm-e_6ZMRl7w9dd38C26qjBqj_a/view?usp=sharing",
   },
   {
     id: "2",
