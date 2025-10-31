@@ -17,24 +17,54 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          degree: string | null
           email: string
           full_name: string | null
+          gpa: string | null
           id: string
+          location: string | null
+          phone: string | null
+          preferred_duration: string | null
+          preferred_location: string | null
+          preferred_mode: string | null
+          skills: string[] | null
+          university: string | null
           updated_at: string
+          year: string | null
         }
         Insert: {
           created_at?: string
+          degree?: string | null
           email: string
           full_name?: string | null
+          gpa?: string | null
           id: string
+          location?: string | null
+          phone?: string | null
+          preferred_duration?: string | null
+          preferred_location?: string | null
+          preferred_mode?: string | null
+          skills?: string[] | null
+          university?: string | null
           updated_at?: string
+          year?: string | null
         }
         Update: {
           created_at?: string
+          degree?: string | null
           email?: string
           full_name?: string | null
+          gpa?: string | null
           id?: string
+          location?: string | null
+          phone?: string | null
+          preferred_duration?: string | null
+          preferred_location?: string | null
+          preferred_mode?: string | null
+          skills?: string[] | null
+          university?: string | null
           updated_at?: string
+          year?: string | null
         }
         Relationships: []
       }

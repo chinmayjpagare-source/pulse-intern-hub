@@ -62,20 +62,20 @@ export const useProfile = () => {
           personalInfo: {
             name: data.full_name || "",
             email: data.email || "",
-            phone: "",
-            location: "",
+            phone: data.phone || "",
+            location: data.location || "",
           },
           academic: {
-            degree: "",
-            year: "",
-            gpa: "",
-            university: "",
+            degree: data.degree || "",
+            year: data.year || "",
+            gpa: data.gpa || "",
+            university: data.university || "",
           },
-          skills: [],
+          skills: data.skills || [],
           preferences: {
-            preferredDuration: "",
-            preferredMode: "Remote" as "Remote" | "On-site" | "Hybrid",
-            preferredLocation: "",
+            preferredDuration: data.preferred_duration || "",
+            preferredMode: (data.preferred_mode || "Remote") as "Remote" | "On-site" | "Hybrid",
+            preferredLocation: data.preferred_location || "",
           },
         };
         setProfile(fetchedProfile);
@@ -104,6 +104,16 @@ export const useProfile = () => {
         .update({
           full_name: profile.personalInfo.name,
           email: profile.personalInfo.email,
+          phone: profile.personalInfo.phone,
+          location: profile.personalInfo.location,
+          degree: profile.academic.degree,
+          year: profile.academic.year,
+          gpa: profile.academic.gpa,
+          university: profile.academic.university,
+          skills: profile.skills,
+          preferred_duration: profile.preferences.preferredDuration,
+          preferred_mode: profile.preferences.preferredMode,
+          preferred_location: profile.preferences.preferredLocation,
           updated_at: new Date().toISOString(),
         })
         .eq('id', user.id);
@@ -128,11 +138,37 @@ export const useProfile = () => {
     }
   };
 
-  const updateProfile = (updates: Partial<UserProfile>) => {
+  const updateProfile = async (updates: Partial<UserProfile>) => {
     const updatedProfile = { ...profile, ...updates };
     setProfile(updatedProfile);
     // Auto-save to localStorage for immediate updates
     localStorage.setItem("user-profile", JSON.stringify(updatedProfile));
+    
+    // Auto-save to backend if user is logged in
+    if (user) {
+      try {
+        await supabase
+          .from('profiles')
+          .update({
+            full_name: updatedProfile.personalInfo.name,
+            email: updatedProfile.personalInfo.email,
+            phone: updatedProfile.personalInfo.phone,
+            location: updatedProfile.personalInfo.location,
+            degree: updatedProfile.academic.degree,
+            year: updatedProfile.academic.year,
+            gpa: updatedProfile.academic.gpa,
+            university: updatedProfile.academic.university,
+            skills: updatedProfile.skills,
+            preferred_duration: updatedProfile.preferences.preferredDuration,
+            preferred_mode: updatedProfile.preferences.preferredMode,
+            preferred_location: updatedProfile.preferences.preferredLocation,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', user.id);
+      } catch (error) {
+        console.error('Error auto-saving profile:', error);
+      }
+    }
   };
 
   const getProfileCompleteness = () => {
