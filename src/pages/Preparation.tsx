@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { MessageCircle, User, Bot, PlayCircle, RotateCcw } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import ChatInternshipCard from "@/components/ChatInternshipCard";
 
 interface Message {
@@ -25,6 +24,34 @@ interface InterviewSession {
   completedAt?: Date;
 }
 
+// Sample internships data
+const sampleInternships = [
+  {
+    id: "1",
+    title: "Full Stack Developer",
+    company: "TechCorp Solutions",
+    location: "Bangalore, India",
+    mode: "Hybrid",
+    duration: "3 months",
+    deadline: "Feb 15, 2025",
+    stipend: "₹15,000/month",
+    skills: ["React", "Node.js", "JavaScript", "MongoDB"],
+    applicationLink: "https://techcorp.com/apply",
+  },
+  {
+    id: "2",
+    title: "Machine Learning Intern",
+    company: "AI Labs",
+    location: "Mumbai, India",
+    mode: "Remote",
+    duration: "6 months",
+    deadline: "Feb 28, 2025",
+    stipend: "₹20,000/month",
+    skills: ["Python", "TensorFlow", "Machine Learning"],
+    applicationLink: "https://ailabs.com/apply",
+  },
+];
+
 const Preparation = () => {
   const { toast } = useToast();
   const [selectedInterviewType, setSelectedInterviewType] = useState<string>("");
@@ -32,35 +59,7 @@ const Preparation = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isInterviewActive, setIsInterviewActive] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [internships, setInternships] = useState<any[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    fetchInternships();
-  }, []);
-
-  const fetchInternships = async () => {
-    const { data, error } = await supabase
-      .from('internships')
-      .select('*')
-      .order('posted_date', { ascending: false })
-      .limit(10);
-    
-    if (data && data.length > 0) {
-      setInternships(data.map(internship => ({
-        id: internship.id,
-        title: internship.title,
-        company: internship.company,
-        location: internship.location,
-        mode: internship.type || "Remote",
-        duration: "3 months",
-        deadline: internship.deadline ? new Date(internship.deadline).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : undefined,
-        stipend: internship.salary_range,
-        skills: internship.requirements || [],
-        applicationLink: internship.application_url,
-      })));
-    }
-  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -73,23 +72,19 @@ const Preparation = () => {
 
   const getRelevantInternships = (userMessage: string) => {
     // Simple keyword matching for skills
-    const skills = ['react', 'python', 'java', 'javascript', 'node', 'ml', 'machine learning', 'data', 'web', 'mobile', 'android', 'ios'];
+    const skills = ['react', 'python', 'java', 'javascript', 'node', 'ml', 'machine learning'];
     const matchedSkills = skills.filter(skill => userMessage.toLowerCase().includes(skill));
     
-    if (matchedSkills.length > 0 && internships.length > 0) {
-      // Return internships that match any of the skills
-      return internships
-        .filter(internship => 
-          matchedSkills.some(skill => 
-            internship.skills?.some((s: string) => s.toLowerCase().includes(skill)) ||
-            internship.title.toLowerCase().includes(skill)
-          )
+    if (matchedSkills.length > 0) {
+      return sampleInternships.filter(internship => 
+        matchedSkills.some(skill => 
+          internship.skills?.some((s: string) => s.toLowerCase().includes(skill))
         )
-        .slice(0, 3);
+      );
     }
     
-    // Return first 3 internships as default
-    return internships.slice(0, 3);
+    // Return all sample internships as default
+    return sampleInternships;
   };
 
   const startInterview = async () => {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import InternshipCard from "@/components/InternshipCard";
 import Layout from "@/components/Layout";
@@ -268,59 +268,9 @@ const Index = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [internships, setInternships] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchInternships();
-  }, []);
-
-  const fetchInternships = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('internships')
-      .select('*')
-      .order('posted_date', { ascending: false });
-    
-    if (error) {
-      console.error('Error fetching internships:', error);
-      toast({
-        title: "Error loading internships",
-        description: "Failed to fetch internships from database",
-        variant: "destructive",
-      });
-      setInternships(sampleInternships);
-      setLoading(false);
-      return;
-    }
-    
-    if (data && data.length > 0) {
-      console.log('Fetched internships from database:', data.length);
-      // Transform database internships to match the component format
-      const transformedData = data.map(internship => ({
-        id: internship.id,
-        title: internship.title,
-        company: internship.company,
-        isVerified: true,
-        location: internship.location,
-        mode: (internship.type || "Remote") as "Remote" | "On-site" | "Hybrid",
-        duration: "3 months",
-        description: internship.description,
-        skills: Array.isArray(internship.requirements) ? internship.requirements : [],
-        deadline: internship.deadline ? new Date(internship.deadline).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : "Not specified",
-        isPaid: !!internship.salary_range,
-        stipend: internship.salary_range || undefined,
-        tags: Array.isArray(internship.tags) ? internship.tags : [],
-        category: "Computer Science",
-        applicationLink: internship.application_url || "#",
-      }));
-      setInternships(transformedData);
-    } else {
-      console.log('No internships in database, using sample data');
-      setInternships(sampleInternships);
-    }
-    setLoading(false);
-  };
+  // Use hardcoded sample internships only
+  const internships = sampleInternships;
 
   // Calculate skill matches for each internship
   const getSkillMatch = (internshipSkills: string[]) => {
@@ -377,16 +327,6 @@ const Index = () => {
   const handleSearch = (query: string) => {
     setSearchQuery(query);
   };
-
-  if (loading) {
-    return (
-      <Layout onSearch={handleSearch}>
-        <div className="p-6 max-w-7xl mx-auto">
-          <div className="text-center py-12">Loading internships...</div>
-        </div>
-      </Layout>
-    );
-  }
 
   return (
     <Layout onSearch={handleSearch}>
