@@ -4,11 +4,8 @@ import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Shield, FileText } from "lucide-react";
+import { Users, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { sampleInternships } from "@/data/internships";
-import { PDFUploadCard } from "@/components/PDFUploadCard";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Profile {
   id: string;
@@ -30,7 +27,6 @@ const Admin = () => {
   
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [userRoles, setUserRoles] = useState<UserRole[]>([]);
-  const [internshipPdfs, setInternshipPdfs] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
@@ -42,7 +38,6 @@ const Admin = () => {
     if (user && isAdmin) {
       fetchProfiles();
       fetchUserRoles();
-      fetchInternshipPdfs();
     }
   }, [user, isAdmin]);
 
@@ -64,52 +59,9 @@ const Admin = () => {
     if (data) setUserRoles(data);
   };
 
-  const fetchInternshipPdfs = async () => {
-    const { data } = await supabase
-      .from('internship_pdfs')
-      .select('internship_id, pdf_url');
-    
-    if (data) {
-      const pdfsMap = data.reduce((acc, item) => ({
-        ...acc,
-        [item.internship_id]: item.pdf_url
-      }), {});
-      setInternshipPdfs(pdfsMap);
-    }
-  };
-
   const getUserRole = (userId: string) => {
     const role = userRoles.find(r => r.user_id === userId);
     return role?.role || 'user';
-  };
-
-  const handlePdfUpdate = async (internshipId: string, url: string) => {
-    // Update local state immediately for responsive UI
-    setInternshipPdfs(prev => ({
-      ...prev,
-      [internshipId]: url
-    }));
-
-    // Save to database
-    if (url) {
-      const { error } = await supabase
-        .from('internship_pdfs')
-        .upsert({
-          internship_id: internshipId,
-          pdf_url: url,
-          uploaded_by: user?.id
-        });
-      
-      if (error) {
-        console.error('Error saving PDF URL:', error);
-      }
-    } else {
-      // Delete from database if URL is empty (PDF was deleted)
-      await supabase
-        .from('internship_pdfs')
-        .delete()
-        .eq('internship_id', internshipId);
-    }
   };
 
   if (loading) {
@@ -125,23 +77,11 @@ const Admin = () => {
       <div className="space-y-6 max-w-7xl mx-auto p-6">
         <div>
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <p className="text-muted-foreground">Manage users, PDFs, and system settings</p>
+          <p className="text-muted-foreground">Manage users and system settings</p>
         </div>
 
-        <Tabs defaultValue="users" className="w-full">
-          <TabsList>
-            <TabsTrigger value="users">
-              <Users className="h-4 w-4 mr-2" />
-              User Management
-            </TabsTrigger>
-            <TabsTrigger value="pdfs">
-              <FileText className="h-4 w-4 mr-2" />
-              Internship PDFs
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="users" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card>
               <CardHeader>
                 <CardTitle>Registered Users</CardTitle>
@@ -216,33 +156,8 @@ const Admin = () => {
                 </div>
               </CardContent>
             </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="pdfs" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Internship Detail PDFs</CardTitle>
-                <CardDescription>
-                  Upload PDF files for each internship. Students will see a "Details" button that opens these PDFs.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {sampleInternships.map((internship) => (
-                    <PDFUploadCard
-                      key={internship.id}
-                      internshipId={internship.id}
-                      internshipTitle={internship.title}
-                      currentPdfUrl={internshipPdfs[internship.id] || internship.detailsDocument}
-                      onPdfUploaded={(url) => handlePdfUpdate(internship.id, url)}
-                    />
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </div>
     </Layout>
   );

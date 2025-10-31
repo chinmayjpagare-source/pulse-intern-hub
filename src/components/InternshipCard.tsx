@@ -1,4 +1,4 @@
-import { MapPin, Clock, Calendar, Bookmark, FileText, ExternalLink } from "lucide-react";
+import { MapPin, Clock, Calendar, Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
@@ -19,8 +19,6 @@ interface InternshipCardProps {
   tags: string[];
   skillMatch?: number;
   onApply?: () => void;
-  detailsDocument?: string;
-  applicationLink?: string;
 }
 const InternshipCard = ({
   id,
@@ -37,9 +35,7 @@ const InternshipCard = ({
   stipend,
   tags,
   skillMatch,
-  onApply,
-  detailsDocument,
-  applicationLink
+  onApply
 }: InternshipCardProps) => {
   const { isBookmarked, toggleBookmark } = useBookmarks();
   const getModeColor = (mode: string) => {
@@ -132,12 +128,9 @@ const InternshipCard = ({
         <div className="mb-4">
           <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Required Skills</h4>
           <div className="flex flex-wrap gap-2">
-            {skills.slice(0, 4).map((skill, index) => <Badge key={index} variant="secondary" className="text-xs px-3 py-1.5 font-medium hover:bg-primary hover:text-primary-foreground transition-colors">
+            {skills.map((skill, index) => <Badge key={index} variant="secondary" className="text-xs px-3 py-1.5 font-medium hover:bg-primary hover:text-primary-foreground transition-colors">
                 {skill}
               </Badge>)}
-            {skills.length > 4 && <Badge variant="secondary" className="text-xs px-3 py-1.5 font-medium">
-                +{skills.length - 4}
-              </Badge>}
           </div>
         </div>
       </CardContent>
@@ -149,14 +142,6 @@ const InternshipCard = ({
               {tag}
             </Badge>)}
         </div>
-
-        <Button 
-          onClick={() => window.open(detailsDocument || '#', '_blank')} 
-          className="w-full bg-gradient-primary hover:opacity-90 shadow-md font-semibold group"
-        >
-          <FileText className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
-          View Details
-        </Button>
       </CardFooter>
     </Card>;
 };
