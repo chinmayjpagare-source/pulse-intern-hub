@@ -70,6 +70,19 @@ export const PDFUploadCard = ({
         .from("internship-pdfs")
         .getPublicUrl(filePath);
 
+      // Save PDF URL to database
+      const { error: dbError } = await supabase
+        .from("internship_pdfs")
+        .upsert({
+          internship_id: internshipId,
+          pdf_url: publicUrl,
+          uploaded_by: (await supabase.auth.getUser()).data.user?.id,
+        }, {
+          onConflict: "internship_id",
+        });
+
+      if (dbError) throw dbError;
+
       onPdfUploaded(publicUrl);
 
       toast({
@@ -99,12 +112,20 @@ export const PDFUploadCard = ({
       const urlParts = currentPdfUrl.split("/");
       const fileName = urlParts[urlParts.length - 1];
 
-      // Delete the file
+      // Delete the file from storage
       const { error } = await supabase.storage
         .from("internship-pdfs")
         .remove([fileName]);
 
       if (error) throw error;
+
+      // Delete from database
+      const { error: dbError } = await supabase
+        .from("internship_pdfs")
+        .delete()
+        .eq("internship_id", internshipId);
+
+      if (dbError) throw dbError;
 
       onPdfUploaded("");
 

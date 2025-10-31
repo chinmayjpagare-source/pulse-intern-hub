@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import InternshipCard from "@/components/InternshipCard";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { useBookmarks } from "@/contexts/BookmarkContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Target, TrendingUp, Award, Filter, ExternalLink } from "lucide-react";
 import { sampleInternships } from "@/data/internships";
+import { supabase } from "@/integrations/supabase/client";
 
 // Learning resources for skills
 const skillResources: Record<string, string> = {
@@ -68,9 +69,32 @@ const Index = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [internshipPdfs, setInternshipPdfs] = useState<Record<string, string>>({});
 
-  // Use hardcoded sample internships only
-  const internships = sampleInternships;
+  // Fetch PDF URLs from database
+  useEffect(() => {
+    const fetchPdfUrls = async () => {
+      const { data } = await supabase
+        .from('internship_pdfs')
+        .select('internship_id, pdf_url');
+      
+      if (data) {
+        const pdfsMap = data.reduce((acc, item) => ({
+          ...acc,
+          [item.internship_id]: item.pdf_url
+        }), {});
+        setInternshipPdfs(pdfsMap);
+      }
+    };
+
+    fetchPdfUrls();
+  }, []);
+
+  // Merge PDF URLs with internship data
+  const internships = sampleInternships.map(internship => ({
+    ...internship,
+    detailsDocument: internshipPdfs[internship.id] || internship.detailsDocument
+  }));
 
   // Calculate skill matches for each internship
   const getSkillMatch = (internshipSkills: string[]) => {

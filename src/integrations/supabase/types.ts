@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      internship_pdfs: {
+        Row: {
+          created_at: string
+          id: string
+          internship_id: string
+          pdf_url: string
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          internship_id: string
+          pdf_url: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          internship_id?: string
+          pdf_url?: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

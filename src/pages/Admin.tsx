@@ -42,6 +42,7 @@ const Admin = () => {
     if (user && isAdmin) {
       fetchProfiles();
       fetchUserRoles();
+      fetchInternshipPdfs();
     }
   }, [user, isAdmin]);
 
@@ -61,6 +62,20 @@ const Admin = () => {
       .order('created_at', { ascending: false });
     
     if (data) setUserRoles(data);
+  };
+
+  const fetchInternshipPdfs = async () => {
+    const { data } = await supabase
+      .from('internship_pdfs')
+      .select('internship_id, pdf_url');
+    
+    if (data) {
+      const pdfsMap = data.reduce((acc, item) => ({
+        ...acc,
+        [item.internship_id]: item.pdf_url
+      }), {});
+      setInternshipPdfs(pdfsMap);
+    }
   };
 
   const getUserRole = (userId: string) => {

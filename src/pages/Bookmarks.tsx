@@ -9,23 +9,45 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Bookmark, Calendar, Clock, AlertTriangle } from "lucide-react";
 import { useBookmarks } from "@/contexts/BookmarkContext";
 import { sampleInternships } from "@/data/internships";
+import { supabase } from "@/integrations/supabase/client";
 
 const Bookmarks = () => {
   const { bookmarkedIds, toggleBookmark } = useBookmarks();
   const [bookmarkedInternships, setBookmarkedInternships] = useState<typeof sampleInternships>([]);
   const [filteredInternships, setFilteredInternships] = useState<typeof sampleInternships>([]);
+  const [internshipPdfs, setInternshipPdfs] = useState<Record<string, string>>({});
 
-  // Filter internships based on current bookmarked IDs
+  // Fetch PDF URLs from database
+  useEffect(() => {
+    const fetchPdfUrls = async () => {
+      const { data } = await supabase
+        .from('internship_pdfs')
+        .select('internship_id, pdf_url');
+      
+      if (data) {
+        const pdfsMap = data.reduce((acc, item) => ({
+          ...acc,
+          [item.internship_id]: item.pdf_url
+        }), {});
+        setInternshipPdfs(pdfsMap);
+      }
+    };
+
+    fetchPdfUrls();
+  }, []);
+
+  // Filter internships based on current bookmarked IDs and merge with PDF URLs
   useEffect(() => {
     const filtered = sampleInternships
       .filter(internship => bookmarkedIds.includes(internship.id))
       .map(internship => ({
         ...internship,
+        detailsDocument: internshipPdfs[internship.id] || internship.detailsDocument,
         bookmarkedAt: new Date() // You could store actual bookmark dates in the context if needed
       }));
     setBookmarkedInternships(filtered);
     setFilteredInternships(filtered);
-  }, [bookmarkedIds]);
+  }, [bookmarkedIds, internshipPdfs]);
 
   const getDaysUntilDeadline = (deadline: string) => {
     const deadlineDate = new Date(deadline);
