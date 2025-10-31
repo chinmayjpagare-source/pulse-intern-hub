@@ -17,6 +17,7 @@ export const sampleInternships = [
     category: "Computer Science",
     detailsDocument: "",
     applicationLink: "https://techcorp.com/apply/fullstack",
+    pdfUrl: "",
   },
   {
     id: "2",
@@ -35,6 +36,7 @@ export const sampleInternships = [
     category: "Computer Science",
     detailsDocument: "",
     applicationLink: "https://aiinnovations.com/apply/ml-engineer",
+    pdfUrl: "",
   },
   {
     id: "3",
@@ -53,6 +55,7 @@ export const sampleInternships = [
     category: "Computer Science",
     detailsDocument: "",
     applicationLink: "https://designhub.com/apply/uiux",
+    pdfUrl: "",
   },
   {
     id: "4",
@@ -71,6 +74,7 @@ export const sampleInternships = [
     category: "Computer Science",
     detailsDocument: "",
     applicationLink: "https://dataflow.com/apply/data-science",
+    pdfUrl: "",
   },
   {
     id: "5",
@@ -89,6 +93,7 @@ export const sampleInternships = [
     category: "Information Technology",
     detailsDocument: "",
     applicationLink: "https://appventure.com/apply/mobile",
+    pdfUrl: "",
   },
   {
     id: "6",
@@ -107,6 +112,7 @@ export const sampleInternships = [
     category: "Information Technology",
     detailsDocument: "",
     applicationLink: "https://securenet.com/apply/security",
+    pdfUrl: "",
   },
   {
     id: "7",
@@ -125,6 +131,7 @@ export const sampleInternships = [
     category: "Computer Science",
     detailsDocument: "",
     applicationLink: "https://webcraft.com/apply/frontend",
+    pdfUrl: "",
   },
   {
     id: "8",
@@ -143,6 +150,7 @@ export const sampleInternships = [
     category: "Electronics and Telecommunication",
     detailsDocument: "",
     applicationLink: "https://smarttech.com/apply/iot",
+    pdfUrl: "",
   },
   {
     id: "9",
@@ -161,6 +169,7 @@ export const sampleInternships = [
     category: "Biomedical Engineering",
     detailsDocument: "",
     applicationLink: "https://biomed.com/apply/testing",
+    pdfUrl: "",
   },
   {
     id: "10",
@@ -179,6 +188,7 @@ export const sampleInternships = [
     category: "Computer Science",
     detailsDocument: "",
     applicationLink: "https://cloudfirst.com/apply/cloud",
+    pdfUrl: "",
   },
 ];
 

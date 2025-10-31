@@ -1,4 +1,4 @@
-import { MapPin, Clock, Calendar, Bookmark } from "lucide-react";
+import { MapPin, Clock, Calendar, Bookmark, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
@@ -19,6 +19,7 @@ interface InternshipCardProps {
   tags: string[];
   skillMatch?: number;
   onApply?: () => void;
+  pdfUrl?: string;
 }
 const InternshipCard = ({
   id,
@@ -35,7 +36,8 @@ const InternshipCard = ({
   stipend,
   tags,
   skillMatch,
-  onApply
+  onApply,
+  pdfUrl
 }: InternshipCardProps) => {
   const { isBookmarked, toggleBookmark } = useBookmarks();
   const getModeColor = (mode: string) => {
@@ -142,6 +144,19 @@ const InternshipCard = ({
               {tag}
             </Badge>)}
         </div>
+        
+        {/* View PDF Button */}
+        {pdfUrl && (
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => window.open(pdfUrl, '_blank')}
+            className="w-full mt-2 group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            View Details (PDF)
+          </Button>
+        )}
       </CardFooter>
     </Card>;
 };
