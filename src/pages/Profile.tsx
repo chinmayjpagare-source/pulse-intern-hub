@@ -40,7 +40,11 @@ const Profile = () => {
   };
 
   const handleResumeUpload = (file: File | null) => {
-    updateProfile({ resume: file || undefined });
+    if (file) {
+      uploadAndParse(file);
+    } else {
+      updateProfile({ resume: undefined });
+    }
   };
 
   const completeness = getProfileCompleteness();
