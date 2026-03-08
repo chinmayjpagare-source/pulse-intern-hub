@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
+import PageTransition from "./PageTransition";
 
 interface LayoutProps {
   children: ReactNode;
@@ -16,7 +17,9 @@ const Layout = ({ children, onSearch }: LayoutProps) => {
         <Sidebar />
         <main className="flex-1 md:ml-0 p-6">
           <div className="max-w-7xl mx-auto">
-            {children}
+            <PageTransition>
+              {children}
+            </PageTransition>
           </div>
         </main>
       </div>

@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import InternshipCard from "@/components/InternshipCard";
 import Layout from "@/components/Layout";
+import StaggerContainer from "@/components/StaggerContainer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
