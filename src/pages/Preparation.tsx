@@ -276,7 +276,7 @@ const Preparation = () => {
   };
 
   return (
-    <Layout>
+    <Layout mainScrollable={false} contentClassName="!p-0">
       <div className="h-full min-h-0 flex flex-col">
         <AnimatePresence mode="wait">
           {!isInterviewActive ? (
