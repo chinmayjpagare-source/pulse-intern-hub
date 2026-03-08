@@ -292,7 +292,7 @@ const Index = () => {
               )}
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {personalizedInternships.map((internship) => (
               <InternshipCard
                 key={internship.id}
@@ -300,7 +300,7 @@ const Index = () => {
                 skillMatch={internship.skillMatch}
               />
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </div>
     </Layout>
