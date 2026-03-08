@@ -232,14 +232,24 @@ const Profile = () => {
           </CardContent>
         </Card>
 
-        {/* Resume Upload */}
-        <Card>
+        {/* Resume Upload & Parser */}
+        <Card className="relative overflow-hidden">
+          {isParsing && (
+            <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center gap-3">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="text-sm font-medium text-muted-foreground">Parsing your resume with AI...</p>
+            </div>
+          )}
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
               Resume
+              <span className="ml-auto flex items-center gap-1 text-xs font-normal text-primary">
+                <Sparkles className="h-3 w-3" />
+                AI-powered auto-fill
+              </span>
             </CardTitle>
-            <CardDescription>Upload your latest resume (PDF, DOC, DOCX)</CardDescription>
+            <CardDescription>Upload your resume and we'll auto-fill your profile using AI</CardDescription>
           </CardHeader>
           <CardContent>
             <FileUpload
