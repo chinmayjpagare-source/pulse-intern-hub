@@ -144,7 +144,22 @@ const Preparation = () => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages: conversationMessages, interviewType: selectedInterviewType }),
+      body: JSON.stringify({
+        messages: conversationMessages,
+        interviewType: selectedInterviewType,
+        candidateProfile: {
+          full_name: profile.personalInfo.name,
+          email: profile.personalInfo.email,
+          degree: profile.academic.degree,
+          university: profile.academic.university,
+          year: profile.academic.year,
+          gpa: profile.academic.gpa,
+          location: profile.personalInfo.location,
+          skills: profile.skills,
+          preferred_mode: profile.preferences.preferredMode,
+          preferred_duration: profile.preferences.preferredDuration,
+        },
+      }),
     });
 
     if (!response.ok) {
