@@ -12,11 +12,31 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, interviewType } = await req.json();
+    const { messages, interviewType, candidateProfile } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
+    }
+
+    // Build candidate context from profile data
+    let candidateContext = "";
+    if (candidateProfile) {
+      const parts: string[] = [];
+      if (candidateProfile.full_name) parts.push(`Name: ${candidateProfile.full_name}`);
+      if (candidateProfile.email) parts.push(`Email: ${candidateProfile.email}`);
+      if (candidateProfile.degree) parts.push(`Degree: ${candidateProfile.degree}`);
+      if (candidateProfile.university) parts.push(`University: ${candidateProfile.university}`);
+      if (candidateProfile.year) parts.push(`Year: ${candidateProfile.year}`);
+      if (candidateProfile.gpa) parts.push(`GPA: ${candidateProfile.gpa}`);
+      if (candidateProfile.location) parts.push(`Location: ${candidateProfile.location}`);
+      if (candidateProfile.skills?.length) parts.push(`Skills: ${candidateProfile.skills.join(", ")}`);
+      if (candidateProfile.preferred_mode) parts.push(`Preferred work mode: ${candidateProfile.preferred_mode}`);
+      if (candidateProfile.preferred_duration) parts.push(`Preferred duration: ${candidateProfile.preferred_duration}`);
+      
+      if (parts.length > 0) {
+        candidateContext = `\n\nCANDIDATE PROFILE (use this to personalize questions):\n${parts.join("\n")}\n\nIMPORTANT: Tailor your interview questions to the candidate's background, skills, and experience. For technical interviews, ask about their listed skills. For HR/behavioral interviews, reference their degree, university, and career interests. This makes the practice more realistic and relevant.`;
+      }
     }
 
     // Create system prompt based on interview type
@@ -92,9 +112,9 @@ EVALUATION MODE (ONLY when user ends interview):
 - DO NOT make up scenarios they didn't mention`
     };
 
-    const systemPrompt = systemPrompts[interviewType as keyof typeof systemPrompts] || systemPrompts.HR;
+    const systemPrompt = (systemPrompts[interviewType as keyof typeof systemPrompts] || systemPrompts.HR) + candidateContext;
 
-    console.log(`Starting interview chat - Type: ${interviewType}`);
+    console.log(`Starting interview chat - Type: ${interviewType}, hasProfile: ${!!candidateProfile}`);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

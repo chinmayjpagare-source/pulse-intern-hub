@@ -12,6 +12,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import ChatInternshipCard from "@/components/ChatInternshipCard";
 import { motion, AnimatePresence } from "framer-motion";
+import { useProfile } from "@/hooks/useProfile";
 
 interface Message {
   role: "user" | "bot";
@@ -79,6 +80,7 @@ const interviewTypes = [
 
 const Preparation = () => {
   const { toast } = useToast();
+  const { profile } = useProfile();
   const [selectedInterviewType, setSelectedInterviewType] = useState<string>("");
   const [currentMessage, setCurrentMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -142,7 +144,22 @@ const Preparation = () => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages: conversationMessages, interviewType: selectedInterviewType }),
+      body: JSON.stringify({
+        messages: conversationMessages,
+        interviewType: selectedInterviewType,
+        candidateProfile: {
+          full_name: profile.personalInfo.name,
+          email: profile.personalInfo.email,
+          degree: profile.academic.degree,
+          university: profile.academic.university,
+          year: profile.academic.year,
+          gpa: profile.academic.gpa,
+          location: profile.personalInfo.location,
+          skills: profile.skills,
+          preferred_mode: profile.preferences.preferredMode,
+          preferred_duration: profile.preferences.preferredDuration,
+        },
+      }),
     });
 
     if (!response.ok) {
