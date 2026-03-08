@@ -9,10 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FileUpload } from "@/components/ui/file-upload";
 import { SkillInput } from "@/components/ui/skill-input";
 import { useProfile } from "@/hooks/useProfile";
-import { User, GraduationCap, Settings as SettingsIcon, FileText } from "lucide-react";
+import { useResumeParser } from "@/hooks/useResumeParser";
+import { User, GraduationCap, Settings as SettingsIcon, FileText, Sparkles, Loader2 } from "lucide-react";
 
 const Profile = () => {
   const { profile, updateProfile, getProfileCompleteness } = useProfile();
+  const { uploadAndParse, isParsing } = useResumeParser(updateProfile);
   const [isEditing, setIsEditing] = useState(false);
 
   const handlePersonalInfoUpdate = (field: string, value: string) => {
@@ -38,7 +40,11 @@ const Profile = () => {
   };
 
   const handleResumeUpload = (file: File | null) => {
-    updateProfile({ resume: file || undefined });
+    if (file) {
+      uploadAndParse(file);
+    } else {
+      updateProfile({ resume: undefined });
+    }
   };
 
   const completeness = getProfileCompleteness();
@@ -226,14 +232,24 @@ const Profile = () => {
           </CardContent>
         </Card>
 
-        {/* Resume Upload */}
-        <Card>
+        {/* Resume Upload & Parser */}
+        <Card className="relative overflow-hidden">
+          {isParsing && (
+            <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center gap-3">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="text-sm font-medium text-muted-foreground">Parsing your resume with AI...</p>
+            </div>
+          )}
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
               Resume
+              <span className="ml-auto flex items-center gap-1 text-xs font-normal text-primary">
+                <Sparkles className="h-3 w-3" />
+                AI-powered auto-fill
+              </span>
             </CardTitle>
-            <CardDescription>Upload your latest resume (PDF, DOC, DOCX)</CardDescription>
+            <CardDescription>Upload your resume and we'll auto-fill your profile using AI</CardDescription>
           </CardHeader>
           <CardContent>
             <FileUpload
