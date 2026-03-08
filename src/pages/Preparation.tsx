@@ -277,7 +277,7 @@ const Preparation = () => {
 
   return (
     <Layout>
-      <div className="h-full flex flex-col max-w-7xl mx-auto">
+      <div className="flex flex-col max-w-7xl mx-auto" style={{ height: 'calc(100vh - 8rem)' }}>
         <AnimatePresence mode="wait">
           {!isInterviewActive ? (
             /* ─── Selection Screen ─── */
