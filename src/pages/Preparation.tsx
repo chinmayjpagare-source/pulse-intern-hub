@@ -172,7 +172,7 @@ const Preparation = () => {
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let accumulatedContent = "";
-    const botMessageIndex = messages.length;
+    // Add an empty bot message that we'll stream into
     setMessages(prev => [...prev, { role: "bot", content: "", timestamp: new Date() }]);
 
     let textBuffer = "";
@@ -194,7 +194,13 @@ const Preparation = () => {
           const content = parsed.choices?.[0]?.delta?.content;
           if (content) {
             accumulatedContent += content;
-            setMessages(prev => prev.map((msg, idx) => idx === botMessageIndex ? { ...msg, content: accumulatedContent } : msg));
+            const snapshot = accumulatedContent;
+            // Always update the last message (which is the bot message we just added)
+            setMessages(prev => {
+              const updated = [...prev];
+              updated[updated.length - 1] = { ...updated[updated.length - 1], content: snapshot };
+              return updated;
+            });
           }
         } catch { /* partial JSON */ }
       }
@@ -401,49 +407,42 @@ const Preparation = () => {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 space-y-4">
+              <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 space-y-4 scroll-smooth">
                 {messages.map((message, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25 }}
-                  >
-                    <div className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                      {message.role === "bot" && (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center flex-shrink-0 mt-1">
-                          <Bot className="h-4 w-4 text-primary-foreground" />
-                        </div>
-                      )}
-                      <div className={`max-w-[80%] md:max-w-[70%] ${message.role === "user" ? "" : ""}`}>
-                        {message.role === "bot" ? (
-                          <div className="space-y-2">
-                            <div className="bg-card border border-border/50 p-3.5 rounded-2xl rounded-tl-sm shadow-sm">
-                              <p className="text-sm whitespace-pre-wrap leading-relaxed">{renderContent(message.content)}</p>
-                              <p className="text-[10px] text-muted-foreground mt-2">{message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                            </div>
-                            {message.internships && message.internships.length > 0 && (
-                              <div className="space-y-2 max-w-md">
-                                {message.internships.map((internship, idx) => (
-                                  <ChatInternshipCard key={idx} {...internship} />
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <div className="bg-primary text-primary-foreground p-3.5 rounded-2xl rounded-tr-sm">
-                            <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
-                            <p className="text-[10px] opacity-60 mt-2">{message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                          </div>
-                        )}
+                  <div key={`${message.role}-${index}`} className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                    {message.role === "bot" && (
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center flex-shrink-0 mt-1">
+                        <Bot className="h-4 w-4 text-primary-foreground" />
                       </div>
-                      {message.role === "user" && (
-                        <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 mt-1">
-                          <User className="h-4 w-4 text-secondary-foreground" />
+                    )}
+                    <div className={`max-w-[80%] md:max-w-[70%]`}>
+                      {message.role === "bot" ? (
+                        <div className="space-y-2">
+                          <div className="bg-card border border-border/50 p-3.5 rounded-2xl rounded-tl-sm shadow-sm">
+                            <p className="text-sm whitespace-pre-wrap leading-relaxed">{renderContent(message.content)}</p>
+                            <p className="text-[10px] text-muted-foreground mt-2">{message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                          </div>
+                          {message.internships && message.internships.length > 0 && (
+                            <div className="space-y-2 max-w-md">
+                              {message.internships.map((internship, idx) => (
+                                <ChatInternshipCard key={idx} {...internship} />
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="bg-primary text-primary-foreground p-3.5 rounded-2xl rounded-tr-sm">
+                          <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                          <p className="text-[10px] opacity-60 mt-2">{message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                         </div>
                       )}
                     </div>
-                  </motion.div>
+                    {message.role === "user" && (
+                      <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 mt-1">
+                        <User className="h-4 w-4 text-secondary-foreground" />
+                      </div>
+                    )}
+                  </div>
                 ))}
                 {isLoading && messages[messages.length - 1]?.role !== "bot" && (
                   <div className="flex gap-3">
