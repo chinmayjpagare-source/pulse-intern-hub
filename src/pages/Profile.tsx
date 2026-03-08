@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FileUpload } from "@/components/ui/file-upload";
 import { SkillInput } from "@/components/ui/skill-input";
 import { useProfile } from "@/hooks/useProfile";
-import { User, GraduationCap, Settings as SettingsIcon, FileText } from "lucide-react";
+import { useResumeParser } from "@/hooks/useResumeParser";
+import { User, GraduationCap, Settings as SettingsIcon, FileText, Sparkles, Loader2 } from "lucide-react";
 
 const Profile = () => {
   const { profile, updateProfile, getProfileCompleteness } = useProfile();
