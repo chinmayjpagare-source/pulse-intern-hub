@@ -172,7 +172,7 @@ const Preparation = () => {
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let accumulatedContent = "";
-    const botMessageIndex = messages.length;
+    // Add an empty bot message that we'll stream into
     setMessages(prev => [...prev, { role: "bot", content: "", timestamp: new Date() }]);
 
     let textBuffer = "";
@@ -194,7 +194,13 @@ const Preparation = () => {
           const content = parsed.choices?.[0]?.delta?.content;
           if (content) {
             accumulatedContent += content;
-            setMessages(prev => prev.map((msg, idx) => idx === botMessageIndex ? { ...msg, content: accumulatedContent } : msg));
+            const snapshot = accumulatedContent;
+            // Always update the last message (which is the bot message we just added)
+            setMessages(prev => {
+              const updated = [...prev];
+              updated[updated.length - 1] = { ...updated[updated.length - 1], content: snapshot };
+              return updated;
+            });
           }
         } catch { /* partial JSON */ }
       }
