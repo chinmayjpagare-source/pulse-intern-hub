@@ -12,6 +12,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import ChatInternshipCard from "@/components/ChatInternshipCard";
 import { motion, AnimatePresence } from "framer-motion";
+import { useProfile } from "@/hooks/useProfile";
 
 interface Message {
   role: "user" | "bot";
