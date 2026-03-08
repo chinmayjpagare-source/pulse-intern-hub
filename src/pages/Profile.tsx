@@ -14,6 +14,7 @@ import { User, GraduationCap, Settings as SettingsIcon, FileText, Sparkles, Load
 
 const Profile = () => {
   const { profile, updateProfile, getProfileCompleteness } = useProfile();
+  const { uploadAndParse, isParsing } = useResumeParser(updateProfile);
   const [isEditing, setIsEditing] = useState(false);
 
   const handlePersonalInfoUpdate = (field: string, value: string) => {
