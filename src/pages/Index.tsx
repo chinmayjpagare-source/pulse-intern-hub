@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import InternshipCard from "@/components/InternshipCard";
 import Layout from "@/components/Layout";
+import StaggerContainer from "@/components/StaggerContainer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -291,7 +292,7 @@ const Index = () => {
               )}
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {personalizedInternships.map((internship) => (
               <InternshipCard
                 key={internship.id}
@@ -299,7 +300,7 @@ const Index = () => {
                 skillMatch={internship.skillMatch}
               />
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </div>
     </Layout>
