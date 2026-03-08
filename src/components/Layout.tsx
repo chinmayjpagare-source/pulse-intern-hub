@@ -16,7 +16,7 @@ const Layout = ({ children, onSearch }: LayoutProps) => {
       <div className="flex flex-1 relative z-10 min-h-0">
         <Sidebar />
         <main className="flex-1 md:ml-0 overflow-y-auto">
-          <div className="max-w-7xl mx-auto p-6">
+          <div className="max-w-7xl mx-auto p-6 h-full min-h-0 w-full">
             <PageTransition>
               {children}
             </PageTransition>

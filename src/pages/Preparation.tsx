@@ -277,7 +277,7 @@ const Preparation = () => {
 
   return (
     <Layout>
-      <div className="flex flex-col max-w-7xl mx-auto" style={{ height: 'calc(100vh - 8rem)' }}>
+      <div className="h-full min-h-0 flex flex-col">
         <AnimatePresence mode="wait">
           {!isInterviewActive ? (
             /* ─── Selection Screen ─── */
@@ -287,7 +287,7 @@ const Preparation = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.3 }}
-              className="p-4 md:p-6 space-y-6"
+              className="p-4 md:p-6 space-y-6 overflow-y-auto"
             >
               {/* Hero */}
               <div className="text-center space-y-2 py-4">
