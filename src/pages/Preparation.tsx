@@ -276,225 +276,201 @@ const Preparation = () => {
   };
 
   return (
-    <Layout mainScrollable={false} contentClassName="!p-0">
-      <div className="h-full min-h-0 flex flex-col">
-        <AnimatePresence mode="wait">
-          {!isInterviewActive ? (
-            /* ─── Selection Screen ─── */
-            <motion.div
-              key="selection"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.3 }}
-              className="p-4 md:p-6 space-y-6 overflow-y-auto"
-            >
-              {/* Hero */}
-              <div className="text-center space-y-2 py-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-2">
-                  <Sparkles className="h-3 w-3" />
-                  AI-Powered Practice
+    <Layout mainScrollable={!isInterviewActive} contentClassName={isInterviewActive ? "!p-0" : ""}>
+      {!isInterviewActive ? (
+        /* ─── Selection Screen ─── */
+        <div className="p-4 md:p-6 space-y-6">
+          {/* Hero */}
+          <div className="text-center space-y-2 py-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-2">
+              <Sparkles className="h-3 w-3" />
+              AI-Powered Practice
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+              Interview Preparation
+            </h1>
+            <p className="text-muted-foreground max-w-lg mx-auto">
+              Practice with our AI coach and get real-time feedback to ace your next internship interview.
+            </p>
+          </div>
+
+          {/* Interview Type Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {interviewTypes.map((type) => {
+              const Icon = type.icon;
+              return (
+                <Card
+                  key={type.value}
+                  className="group cursor-pointer border-2 border-transparent hover:border-primary/30 transition-all duration-300 hover:shadow-[var(--shadow-card-hover)] h-full"
+                  onClick={() => startInterview(type.value)}
+                >
+                  <CardHeader className="pb-3">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${type.color} flex items-center justify-center mb-2 group-hover:scale-110 transition-transform`}>
+                      <Icon className={`h-6 w-6 ${type.iconColor}`} />
+                    </div>
+                    <CardTitle className="text-lg">{type.label}</CardTitle>
+                    <CardDescription className="text-sm">{type.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-0 space-y-3">
+                    <div className="space-y-1.5">
+                      {type.tips.map((tip, i) => (
+                        <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                          <CheckCircle2 className="h-3.5 w-3.5 mt-0.5 text-accent flex-shrink-0" />
+                          <span>{tip}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-1 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity pt-1">
+                      Start Practice <ArrowRight className="h-4 w-4" />
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+
+          {/* Quick Tips */}
+          <Card className="bg-muted/30 border-dashed">
+            <CardContent className="py-4">
+              <div className="flex items-start gap-3">
+                <Lightbulb className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-foreground">Quick Tips</p>
+                  <ul className="text-xs text-muted-foreground space-y-1">
+                    <li>• Answer as you would in a real interview — the AI will evaluate your responses</li>
+                    <li>• Ask the AI to recommend internships anytime during your session</li>
+                    <li>• End the interview anytime to receive a detailed performance evaluation</li>
+                  </ul>
                 </div>
-                <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-                  Interview Preparation
-                </h1>
-                <p className="text-muted-foreground max-w-lg mx-auto">
-                  Practice with our AI coach and get real-time feedback to ace your next internship interview.
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        /* ─── Chat Screen ─── */
+        <div className="h-full flex flex-col">
+          {/* Chat Header - always visible */}
+          <div className="flex items-center justify-between px-4 md:px-6 py-3 border-b bg-card/80 backdrop-blur-sm flex-shrink-0 z-10">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <Bot className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <div>
+                <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  InterviewPro AI
+                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0">{selectedType?.label}</Badge>
+                </h2>
+                <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="h-3 w-3 animate-spin" /> Thinking...
+                    </>
+                  ) : (
+                    <>
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" /> Online
+                    </>
+                  )}
                 </p>
               </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button onClick={endInterview} variant="outline" size="sm" disabled={isLoading}>
+                <Clock className="h-3.5 w-3.5 mr-1" />
+                End & Evaluate
+              </Button>
+              <Button onClick={resetToSelection} variant="ghost" size="sm">
+                <RotateCcw className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </div>
 
-              {/* Interview Type Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {interviewTypes.map((type, index) => {
-                  const Icon = type.icon;
-                  return (
-                    <motion.div
-                      key={type.value}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1, duration: 0.35 }}
-                    >
-                      <Card
-                        className="group cursor-pointer border-2 border-transparent hover:border-primary/30 transition-all duration-300 hover:shadow-[var(--shadow-card-hover)] h-full"
-                        onClick={() => startInterview(type.value)}
-                      >
-                        <CardHeader className="pb-3">
-                          <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${type.color} flex items-center justify-center mb-2 group-hover:scale-110 transition-transform`}>
-                            <Icon className={`h-6 w-6 ${type.iconColor}`} />
-                          </div>
-                          <CardTitle className="text-lg">{type.label}</CardTitle>
-                          <CardDescription className="text-sm">{type.description}</CardDescription>
-                        </CardHeader>
-                        <CardContent className="pt-0 space-y-3">
-                          <div className="space-y-1.5">
-                            {type.tips.map((tip, i) => (
-                              <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
-                                <CheckCircle2 className="h-3.5 w-3.5 mt-0.5 text-accent flex-shrink-0" />
-                                <span>{tip}</span>
-                              </div>
-                            ))}
-                          </div>
-                          <div className="flex items-center gap-1 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity pt-1">
-                            Start Practice <ArrowRight className="h-4 w-4" />
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  );
-                })}
-              </div>
-
-              {/* Quick Tips */}
-              <Card className="bg-muted/30 border-dashed">
-                <CardContent className="py-4">
-                  <div className="flex items-start gap-3">
-                    <Lightbulb className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium text-foreground">Quick Tips</p>
-                      <ul className="text-xs text-muted-foreground space-y-1">
-                        <li>• Answer as you would in a real interview — the AI will evaluate your responses</li>
-                        <li>• Ask the AI to recommend internships anytime during your session</li>
-                        <li>• End the interview anytime to receive a detailed performance evaluation</li>
-                      </ul>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ) : (
-            /* ─── Chat Screen ─── */
-            <motion.div
-              key="chat"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.3 }}
-              className="flex-1 flex flex-col min-h-0 overflow-hidden"
-            >
-              {/* Chat Header */}
-              <div className="flex items-center justify-between px-4 md:px-6 py-3 border-b bg-card/50 backdrop-blur-sm flex-shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                    <Bot className="h-5 w-5 text-primary-foreground" />
-                  </div>
-                  <div>
-                    <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                      InterviewPro AI
-                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">{selectedType?.label}</Badge>
-                    </h2>
-                    <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="h-3 w-3 animate-spin" /> Thinking...
-                        </>
-                      ) : (
-                        <>
-                          <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" /> Online
-                        </>
-                      )}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button onClick={endInterview} variant="outline" size="sm" disabled={isLoading}>
-                    <Clock className="h-3.5 w-3.5 mr-1" />
-                    End & Evaluate
-                  </Button>
-                  <Button onClick={resetToSelection} variant="ghost" size="sm">
-                    <RotateCcw className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </div>
-
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 space-y-4 scroll-smooth">
-                {messages.map((message, index) => (
-                  <div key={`${message.role}-${index}`} className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                    {message.role === "bot" && (
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center flex-shrink-0 mt-1">
-                        <Bot className="h-4 w-4 text-primary-foreground" />
-                      </div>
-                    )}
-                    <div className={`max-w-[80%] md:max-w-[70%]`}>
-                      {message.role === "bot" ? (
-                        <div className="space-y-2">
-                          <div className="bg-card border border-border/50 p-3.5 rounded-2xl rounded-tl-sm shadow-sm">
-                            <p className="text-sm whitespace-pre-wrap leading-relaxed">{renderContent(message.content)}</p>
-                            <p className="text-[10px] text-muted-foreground mt-2">{message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                          </div>
-                          {message.internships && message.internships.length > 0 && (
-                            <div className="space-y-2 max-w-md">
-                              {message.internships.map((internship, idx) => (
-                                <ChatInternshipCard key={idx} {...internship} />
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="bg-primary text-primary-foreground p-3.5 rounded-2xl rounded-tr-sm">
-                          <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
-                          <p className="text-[10px] opacity-60 mt-2">{message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                        </div>
-                      )}
-                    </div>
-                    {message.role === "user" && (
-                      <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 mt-1">
-                        <User className="h-4 w-4 text-secondary-foreground" />
-                      </div>
-                    )}
-                  </div>
-                ))}
-                {isLoading && messages[messages.length - 1]?.role !== "bot" && (
-                  <div className="flex gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center flex-shrink-0">
-                      <Bot className="h-4 w-4 text-primary-foreground" />
-                    </div>
-                    <div className="bg-card border border-border/50 p-3.5 rounded-2xl rounded-tl-sm">
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:0ms]" />
-                        <div className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:150ms]" />
-                        <div className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:300ms]" />
-                      </div>
-                    </div>
+          {/* Messages - scrollable */}
+          <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 space-y-4">
+            {messages.map((message, index) => (
+              <div key={`${message.role}-${index}`} className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                {message.role === "bot" && (
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center flex-shrink-0 mt-1">
+                    <Bot className="h-4 w-4 text-primary-foreground" />
                   </div>
                 )}
-                <div ref={messagesEndRef} />
-              </div>
-
-              {/* Input */}
-              <div className="px-4 md:px-6 py-3 border-t bg-card/50 backdrop-blur-sm flex-shrink-0">
-                <div className="flex items-end gap-2 max-w-4xl mx-auto">
-                  <Textarea
-                    ref={textareaRef}
-                    value={currentMessage}
-                    onChange={(e) => setCurrentMessage(e.target.value)}
-                    placeholder="Type your answer..."
-                    className="min-h-[44px] max-h-[120px] resize-none rounded-xl border-border/60 focus:border-primary/40 bg-background"
-                    rows={1}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        sendMessage();
-                      }
-                    }}
-                  />
-                  <Button
-                    onClick={sendMessage}
-                    disabled={!currentMessage.trim() || isLoading}
-                    size="icon"
-                    className="h-[44px] w-[44px] rounded-xl flex-shrink-0"
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
+                <div className="max-w-[80%] md:max-w-[70%]">
+                  {message.role === "bot" ? (
+                    <div className="space-y-2">
+                      <div className="bg-card border border-border/50 p-3.5 rounded-2xl rounded-tl-sm shadow-sm">
+                        <p className="text-sm whitespace-pre-wrap leading-relaxed">{renderContent(message.content)}</p>
+                        <p className="text-[10px] text-muted-foreground mt-2">{message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                      </div>
+                      {message.internships && message.internships.length > 0 && (
+                        <div className="space-y-2 max-w-md">
+                          {message.internships.map((internship, idx) => (
+                            <ChatInternshipCard key={idx} {...internship} />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="bg-primary text-primary-foreground p-3.5 rounded-2xl rounded-tr-sm">
+                      <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                      <p className="text-[10px] opacity-60 mt-2">{message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                    </div>
+                  )}
                 </div>
-                <p className="text-[10px] text-muted-foreground text-center mt-1.5">
-                  Press Enter to send · Shift+Enter for new line
-                </p>
+                {message.role === "user" && (
+                  <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 mt-1">
+                    <User className="h-4 w-4 text-secondary-foreground" />
+                  </div>
+                )}
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+            ))}
+            {isLoading && messages[messages.length - 1]?.role !== "bot" && (
+              <div className="flex gap-3">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center flex-shrink-0">
+                  <Bot className="h-4 w-4 text-primary-foreground" />
+                </div>
+                <div className="bg-card border border-border/50 p-3.5 rounded-2xl rounded-tl-sm">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:0ms]" />
+                    <div className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:150ms]" />
+                    <div className="w-2 h-2 bg-muted-foreground/40 rounded-full animate-bounce [animation-delay:300ms]" />
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input - always visible */}
+          <div className="px-4 md:px-6 py-3 border-t bg-card/80 backdrop-blur-sm flex-shrink-0">
+            <div className="flex items-end gap-2 max-w-4xl mx-auto">
+              <Textarea
+                ref={textareaRef}
+                value={currentMessage}
+                onChange={(e) => setCurrentMessage(e.target.value)}
+                placeholder="Type your answer..."
+                className="min-h-[44px] max-h-[120px] resize-none rounded-xl border-border/60 focus:border-primary/40 bg-background"
+                rows={1}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                  }
+                }}
+              />
+              <Button
+                onClick={sendMessage}
+                disabled={!currentMessage.trim() || isLoading}
+                size="icon"
+                className="h-[44px] w-[44px] rounded-xl flex-shrink-0"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+            <p className="text-[10px] text-muted-foreground text-center mt-1.5">
+              Press Enter to send · Shift+Enter for new line
+            </p>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };
