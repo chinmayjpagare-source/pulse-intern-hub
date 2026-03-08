@@ -80,6 +80,7 @@ const interviewTypes = [
 
 const Preparation = () => {
   const { toast } = useToast();
+  const { profile } = useProfile();
   const [selectedInterviewType, setSelectedInterviewType] = useState<string>("");
   const [currentMessage, setCurrentMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
