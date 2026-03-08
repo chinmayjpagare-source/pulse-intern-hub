@@ -2,3 +2,6 @@ project_id = "dhkwwhpfihnrszxnuncx"
 
 [functions.interview-chat]
 verify_jwt = false
+
+[functions.parse-resume]
+verify_jwt = false
